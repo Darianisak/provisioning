@@ -2,10 +2,13 @@
 
 set -e
 
-# Define package versions
-GIT_VERSION=1:2.39.2-1.1
-PYTHON_VENV_VERSION=3.11.2-6
-ANSIBLE_CORE_VERSION=2.17.1
+GIT_VERSION="1:2.39.2-1.1"
+PYTHON_VENV_VERSION="3.11.2-6"
+CURL_VERSION="7.88.1-10+deb12u5"  # This SHOULD already be installed.
+
+BASE_REPOSITORY_URL="https://raw.githubusercontent.com/Darianisak/provisioning"
+GIT_BRANCH="darianculver/bootstrap-script"
+ANSIBLE_REQUIREMENTS="ansible-requirements.txt"
 
 echo "A (slightly interactive) script for bootstraping the device for provisioning."
 
@@ -27,7 +30,9 @@ fi
 
 # Install dependencies for further provisioning, i.e., Ansible.
 apt-get update && \
-    apt-get install -y git="${GIT_VERSION}" python3.11-venv="${PYTHON_VENV_VERSION}" 
+    apt-get install -y git="${GIT_VERSION}" curl="${CURL_VERSION}" \
+    python3.11-venv="${PYTHON_VENV_VERSION}"
+
 
 # Set up base directories
 mkdir --parents "/home/${INPUT_USERNAME}/code" && \
