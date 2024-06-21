@@ -17,8 +17,8 @@ if [ "$(whoami)" != 'root' ]; then
     exit 1
 fi
 
-# Assumption: INPUT_USERNAME will always get defined, though this could
-# handle NULL inputs better, etc.
+# Assumption: INPUT_USERNAME will always get defined.
+# FIXME - this could do with some input validation, given it's used for a regex
 read -r --prompt "Username? " INPUT_USERNAME
 
 if grep "^sudo:x:.*:.*${INPUT_USERNAME}.*$" /etc/group ; then  
@@ -28,19 +28,17 @@ else
     usermod -aG sudo "${INPUT_USERNAME}"
 fi
 
-# Install dependencies for further provisioning, i.e., Ansible.
+# Prepare env for Ansible provisioning.
 apt-get update && \
     apt-get install -y git="${GIT_VERSION}" curl="${CURL_VERSION}" \
     python3.11-venv="${PYTHON_VENV_VERSION}"
 
 
-# Set up base directories
 mkdir --parents "/home/${INPUT_USERNAME}/code" && \
     mkdir --parents "/home/${INPUT_USERNAME}/venvs"
 
 chown --verbose --preserve-root --recursive "${INPUT_USERNAME}:${INPUT_USERNAME}" "/home/${INPUT_USERNAME}/code"
 
-# Set up provisioning venv
 mkdir --parents "/home/${INPUT_USERNAME}/venvs/ansible" &&
     ( 
         cd "/home/${INPUT_USERNAME}/venvs/ansible" &&
