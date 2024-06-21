@@ -37,7 +37,6 @@ apt-get update && \
 mkdir --parents "/home/${INPUT_USERNAME}/code" && \
     mkdir --parents "/home/${INPUT_USERNAME}/venvs"
 
-chown --verbose --preserve-root --recursive "${INPUT_USERNAME}:${INPUT_USERNAME}" "/home/${INPUT_USERNAME}/code"
 
 mkdir --parents "/home/${INPUT_USERNAME}/venvs/ansible" &&
     ( 
@@ -45,8 +44,18 @@ mkdir --parents "/home/${INPUT_USERNAME}/venvs/ansible" &&
         python3 -m venv ansible ./
     )
 
-# Switch to provisioning virtual env and install Ansible, etc.
+curl "${BASE_REPOSITORY_URL}/${GIT_BRANCH}/${ANSIBLE_REQUIREMENTS}" --output \
+    "/home/${INPUT_USER}/.ansible-requirements.txt"
+
+chown --verbose --preserve-root --recursive "${INPUT_USERNAME}:${INPUT_USERNAME}" \
+    "/home/${INPUT_USERNAME}"
+
 # shellcheck disable=SC1091
 source ansible/bin/activate  
 
-pip install ansible-core=="${ANSIBLE_CORE_VERSION}"
+pip --require-virtualenv install --requirement \
+    "/home/${INPUT_USER}/.ansible-requirements.txt"
+
+deactivate
+
+rm "/home/${INPUT_USER}/.ansible-requirements.txt"
