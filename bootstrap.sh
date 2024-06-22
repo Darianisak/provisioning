@@ -23,7 +23,7 @@ else
 fi
 
 BASE_REPOSITORY_URL="https://raw.githubusercontent.com/Darianisak/provisioning"
-GIT_BRANCH="darianculver/bootstrap-script"
+GIT_BRANCH="main"
 ANSIBLE_REQUIREMENTS="ansible-requirements.txt"
 
 if [ "$(whoami)" != "root" ]; then
