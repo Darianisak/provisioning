@@ -26,49 +26,45 @@ BASE_REPOSITORY_URL="https://raw.githubusercontent.com/Darianisak/provisioning"
 GIT_BRANCH="darianculver/bootstrap-script"
 ANSIBLE_REQUIREMENTS="ansible-requirements.txt"
 
-echo "A (slightly interactive) script for bootstraping the device for provisioning."
-
-if [ "$(whoami)" != 'root' ]; then
-    echo "Error! Please run this script as root."
+if [ "$(whoami)" != "root" ]; then
+    echo -e "\nError! Please run this script as root!\n"
     exit 1
 fi
 
-# Assumption: INPUT_USERNAME will always get defined.
 # FIXME - this could do with some input validation, given it's used for a regex
 read -r --prompt "Username? " INPUT_USERNAME
 
-if grep "^sudo:x:.*:.*${INPUT_USERNAME}.*$" /etc/group ; then  
-    echo "User already in sudoers. Skipping..."
+if grep "^sudo:x:.*:.*${INPUT_USERNAME}.*$" /etc/group ; then
+    echo -e "\nUser already in sudoers. Skipping...\n"
 else
-    echo "Adding user to sudoers..."
+    echo -e "\nAdding user to sudoers...\n"
     usermod -aG sudo "${INPUT_USERNAME}"
 fi
 
-# Prepare env for Ansible provisioning.
+echo -e "\nUpdating apt repositories and installing dependencies...\n"
+
 apt-get update && \
     apt-get install -y git="${GIT_VERSION}" curl="${CURL_VERSION}" \
     python3.11-venv="${PYTHON_VENV_VERSION}"
-
 
 mkdir --parents "/home/${INPUT_USERNAME}/code" && \
     mkdir --parents "/home/${INPUT_USERNAME}/venvs"
 
 
-mkdir --parents "/home/${INPUT_USERNAME}/venvs/ansible" &&
-    ( 
-        cd "/home/${INPUT_USERNAME}/venvs/ansible" &&
-        python3 -m venv ansible ./
-    )
-
+echo -e "\nDownloading Ansible requirements...\n"
 curl "${BASE_REPOSITORY_URL}/${GIT_BRANCH}/${ANSIBLE_REQUIREMENTS}" --output \
     "/home/${INPUT_USER}/.ansible-requirements.txt"
 
+cat "/home/${INPUT_USER}/.ansible-requirements.txt"
+
+echo -e "\nAmending ownerships with chown (/dev/null)...\n"
 chown --verbose --preserve-root --recursive "${INPUT_USERNAME}:${INPUT_USERNAME}" \
-    "/home/${INPUT_USERNAME}"
+    "/home/${INPUT_USERNAME}" &>/dev/null  # dev/null causes it's LOUD
 
 # shellcheck disable=SC1091
 source ansible/bin/activate  
 
+echo -e "\nInstalling Ansible requirements for ansible-venv...\n"
 pip --require-virtualenv install --requirement \
     "/home/${INPUT_USER}/.ansible-requirements.txt"
 
