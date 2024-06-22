@@ -32,7 +32,12 @@ if [ "$(whoami)" != "root" ]; then
 fi
 
 # FIXME - this could do with some input validation, given it's used for a regex
-read -r --prompt "Username? " INPUT_USERNAME
+read -rp "Username? " INPUT_USERNAME
+
+if ! id --user "${INPUT_USERNAME}" 2>/dev/null ; then
+    echo -e "\nError! User '${INPUT_USERNAME}' does not exist!\n"
+    exit 1
+fi
 
 if grep "^sudo:x:.*:.*${INPUT_USERNAME}.*$" /etc/group ; then
     echo -e "\nUser already in sudoers. Skipping...\n"
@@ -44,12 +49,17 @@ fi
 echo -e "\nUpdating apt repositories and installing dependencies...\n"
 
 apt-get update && \
-    apt-get install -y git="${GIT_VERSION}" curl="${CURL_VERSION}" \
+    apt-get install --assume-yes --no-install-recommends --auto-remove --quiet \
+    git="${GIT_VERSION}" curl="${CURL_VERSION}" \
     python3.11-venv="${PYTHON_VENV_VERSION}"
 
 mkdir --parents "/home/${INPUT_USERNAME}/code" && \
-    mkdir --parents "/home/${INPUT_USERNAME}/venvs"
+    mkdir --parents "/home/${INPUT_USERNAME}/venvs/ansible"
 
+(
+    cd "/home/${INPUT_USERNAME}/venvs" &&
+    python3 -m venv ansible ./
+)
 
 echo -e "\nDownloading Ansible requirements...\n"
 curl "${BASE_REPOSITORY_URL}/${GIT_BRANCH}/${ANSIBLE_REQUIREMENTS}" --output \
@@ -61,8 +71,8 @@ echo -e "\nAmending ownerships with chown (/dev/null)...\n"
 chown --verbose --preserve-root --recursive "${INPUT_USERNAME}:${INPUT_USERNAME}" \
     "/home/${INPUT_USERNAME}" &>/dev/null  # dev/null causes it's LOUD
 
-# shellcheck disable=SC1091
-source ansible/bin/activate  
+# shellcheck disable=SC1091,SC1090
+source "/home/${INPUT_USERNAME}/venvs/ansible/bin/activate"
 
 echo -e "\nInstalling Ansible requirements for ansible-venv...\n"
 pip --require-virtualenv install --requirement \
