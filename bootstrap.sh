@@ -31,8 +31,11 @@ if [ "$(whoami)" != "root" ]; then
     exit 1
 fi
 
-# FIXME - this could do with some input validation, given it's used for a regex
-read -rp "Username? " INPUT_USERNAME
+if [ -z "${INPUT_USERNAME}" ]; then
+    # FIXME - this could do with some input validation, given it's used for a regex
+    echo -e "'INPUT_USERNAME' not found in environment. Prompting..."
+    read -rp "Username? " INPUT_USERNAME
+fi
 
 if ! id --user "${INPUT_USERNAME}" 2>/dev/null ; then
     echo -e "\nError! User '${INPUT_USERNAME}' does not exist!\n"
