@@ -1,0 +1,22 @@
+---
+
+# FIXME - should provide mechanism to run this in Docker via script.
+
+- name: Provision system
+  hosts: localhost
+  gather_facts: true
+  become: true
+  become_user: root
+
+  pre_tasks:
+
+    - name: Debug
+      ansible.builtin.debug:
+        var: ansible_facts
+
+    - name: Check if distro is supported
+      ansible.builtin.assert:
+        that:
+          - false
+        fail_msg: "Error! OS is not supported!"
+        success_msg: "OS is supported."
