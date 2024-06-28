@@ -2,21 +2,51 @@
 
 # FIXME - should provide mechanism to run this in Docker via script.
 
-- name: Provision system
+- name: Provision system.
   hosts: localhost
   gather_facts: true
   become: true
   become_user: root
+  any_errors_fatal: true
 
   pre_tasks:
 
-    - name: Debug
-      ansible.builtin.debug:
-        var: ansible_facts
-
-    - name: Check if distro is supported
+    - name: Check if 'os_family' is supported.
       ansible.builtin.assert:
         that:
-          - false
-        fail_msg: "Error! OS is not supported!"
-        success_msg: "OS is supported."
+          - "{{ ansible_facts.os_family in ('Debian') }}"
+        fail_msg: "Error! 'os_family' is not supported!"
+        success_msg: "'os_family' supported."
+      tags: ['always', 'os_family']
+
+    - name: Update apt-cache.
+      ansible.builtin.apt:
+        clean: true
+        update_cache: true
+      tags: ['apt', 'cache']
+
+    - name: Upgrade default packages.
+      ansible.builtin.apt:
+        upgrade: "safe"
+      tags: ['apt', 'upgrade']
+
+  tasks:
+
+    - name: Install packages from default repositories.
+      ansible.builtin.apt:
+        install_recommends: false
+        name:
+          - git
+          - vim
+      tags: ['apt', 'install']
+
+    # configure docker
+
+
+    # configure codium
+
+    # spotify
+
+    # steam
+
+    # - name:
