@@ -81,6 +81,4 @@ echo -e "\nInstalling Ansible requirements for ansible-venv...\n"
 pip --require-virtualenv install --requirement \
     "/home/${INPUT_USER}/.ansible-requirements.txt"
 
-deactivate
-
 rm "/home/${INPUT_USER}/.ansible-requirements.txt"
