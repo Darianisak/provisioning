@@ -1,0 +1,29 @@
+---
+name: Ansible Tests
+on: [ push, pull_request ]
+
+jobs:
+  tagcheck:
+    runs-on: ubuntu-latest
+    env:
+      INPUT_USERNAME: www-data
+    steps:
+      - uses: actions/checkout@v4
+
+      # README : https://docs.github.com/en/actions/learn-github-actions/variables#defining-environment-variables-for-a-single-workflow
+      # - name: Set up environment variables.
+        # env:
+          # USERNAME: ubuntu
+        # run: echo "USER_VAR=${{ vars.USERNAME }}" >> $INPUT_USERNAME
+
+      # FIXME - there must be a more native way to transport environment variables
+      # between env.vars and the bash script environment.
+      - name: Provision environment variables to scripts.
+        run: >
+          echo "INPUT_USERNAME=${INPUT_USERNAME}" >> .github-vars &&
+          chown 0600 .github-vars
+
+      - name: Run bootstrap script.
+        run: sudo ./bootstrap.sh
+
+      - run: sudo ./integration-tests/tag-regressions/test-tags.sh"
