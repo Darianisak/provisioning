@@ -2,6 +2,14 @@
 
 set -e
 
+if [ -f .github-vars ]; then
+    echo -e "Running in CI - sourcing environment file..."
+    # shellcheck disable=SC1091
+    source .github-vars
+    # shellcheck disable=SC1091
+    source "${VIRTUAL_ENV}/bin/activate"
+fi
+
 echo -e "\nA bash script for performing basic/naive regression tests execution order.\n"
 
 if [ -e "${VIRTUAL_ENV}" ]; then

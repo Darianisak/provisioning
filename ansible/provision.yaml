@@ -14,9 +14,10 @@
     - name: Check if 'os_family' is supported.
       ansible.builtin.assert:
         that:
-          - "{{ ansible_facts.os_family in ('Debian') }}"
-        fail_msg: "Error! 'os_family' is not supported!"
-        success_msg: "'os_family' supported."
+          - "{{ ansible_facts.os_family in ('Debian', 'Ubuntu') }}"  # Ubuntu is supported for CI.
+        fail_msg: "Error! '{{ ansible_facts.os_family }}' is not supported!"
+        success_msg: "'{{ ansible_facts.os_family }}' is supported."
+      when:
       tags: ['always', 'os_family']
 
     - name: Update apt-cache.
