@@ -20,19 +20,6 @@ DIST_CODENAME=$(lsb_release --short --codename 2>/dev/null)
 # similar to how we're dealing with Ansible requirements.
 echo -e "\nSetting up package versions for ${DIST_CODENAME}...\n"
 
-if [ "${DIST_CODENAME}" == "bookworm" ]; then
-    GIT_VERSION="1:2.39.2-1.1"
-    PYTHON_VENV_VERSION="3.11.2-6"
-    CURL_VERSION="7.88.1-10+deb12u5"
-elif [ "${DIST_CODENAME}" == "jammy" ]; then  # FIXME - largely for CI; not natively supported.
-    GIT_VERSION="*"
-    PYTHON_VENV_VERSION="*"
-    CURL_VERSION="*"
-else
-    echo -e "\nError! '${DIST_CODENAME}' is not supported!\n"
-    exit 1
-fi
-
 BASE_REPOSITORY_URL="https://raw.githubusercontent.com/Darianisak/provisioning"
 GIT_BRANCH="main"
 ANSIBLE_REQUIREMENTS="ansible-requirements.txt"
@@ -66,8 +53,7 @@ echo -e "\nUpdating apt repositories and installing dependencies...\n"
 
 apt-get update && \
     apt-get install --assume-yes --no-install-recommends --auto-remove --quiet \
-    git="${GIT_VERSION}" curl="${CURL_VERSION}" \
-    python3.11-venv="${PYTHON_VENV_VERSION}"
+    git curl python3.11-venv python3-apt  # python3-apt for ansible-playbook --check
 
 mkdir --parents "/home/${INPUT_USERNAME}/code" && \
     mkdir --parents "/home/${INPUT_USERNAME}/venvs/ansible"
