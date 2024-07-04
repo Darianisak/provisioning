@@ -1,48 +1,87 @@
 ---
-
 # FIXME - should provide mechanism to run this in Docker via script.
 
-- name: Provision system.
+- name: Provision system
   hosts: localhost
   gather_facts: true
   become: true
   become_user: root
   any_errors_fatal: true
+  # debugger: 'always'
 
   pre_tasks:
 
-    - name: Check if 'os_family' is supported.
+    - name: Check if 'os_family' is supported
       ansible.builtin.assert:
         that:
           - "{{ ansible_facts.os_family in ('Debian', 'Ubuntu') }}"  # Ubuntu is supported for CI.
         fail_msg: "Error! '{{ ansible_facts.os_family }}' is not supported!"
         success_msg: "'{{ ansible_facts.os_family }}' is supported."
-      when:
       tags: ['always', 'os_family']
 
-    - name: Update apt-cache.
+    - name: Update apt-cache
       ansible.builtin.apt:
         clean: true
         update_cache: true
-      tags: ['apt', 'cache']
+      tags: ['always', 'apt', 'cache']
 
-    - name: Upgrade default packages.
+    - name: Upgrade default packages
       ansible.builtin.apt:
         upgrade: "safe"
       tags: ['apt', 'upgrade']
 
   tasks:
 
-    - name: Install packages from default repositories.
+    - name: Install packages from default repositories
       ansible.builtin.apt:
         install_recommends: false
         name:
           - git
           - vim
-      tags: ['apt', 'install']
+          - ca-certificates
+          - curl
+          - dpkg
+      tags: ['always', 'apt', 'install']
 
-    # configure docker
+    - name: Create keyrings directory
+      ansible.builtin.file:
+        owner: root
+        group: root
+        mode: "0755"
+        path: /etc/apt/keyrings
+        state: directory
+      tags: ['always', 'apt', 'keyring']
 
+    - name: Install Docker keyring
+      ansible.builtin.get_url:
+        url: "https://download.docker.com/linux/{{ ansible_facts.os_family | lower }}/gpg"
+        owner: root
+        group: root
+        mode: "0644"
+        dest: /etc/apt/keyrings/docker.asc
+      tags: ['keyring', 'docker']
+
+    - name: Setup Docker source
+      ansible.builtin.template:
+        src: templates/docker-source.j2
+        dest: /etc/apt/sources.list.d/docker.list
+        owner: root
+        group: root
+        mode: "0644"
+      tags: ['source', 'docker']
+
+    - name: Install Docker
+      ansible.builtin.apt:
+        clean: true
+        update_cache: true
+        install_recommends: false
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+      tags: ['apt', 'docker']
 
     # configure codium
 

@@ -42,24 +42,32 @@ function run_test() {
 
     echo -e "\nChecking for regressions against ${TEST_FILE}..."
 
+    echo -e "Test ${1} - ${3}\n" > "${TMP_TEST_FILE}"
+
     # shellcheck disable=SC2086
-    ansible-playbook $DEFAULT_ARGS $2 > "${TMP_TEST_FILE}"
+    ansible-playbook $DEFAULT_ARGS $2 >> "${TMP_TEST_FILE}"
 
     if ! diff "${TEST_FILE}" "${TMP_TEST_FILE}"; then
         echo "Failure."
     else
         echo "Success."
+        rm "${TMP_TEST_FILE}"
     fi
-    rm "${TMP_TEST_FILE}"
 }
 
 echo -e "\nRunning Naive regression tests...\n\n"
 
 # Test 'default' tasks.
-run_test "001" " "
+run_test "001" " " "# Check the 'default' provisioning order"
 
 # Test 'always' tasks.
-run_test "002" "--tags always"
+run_test "002" "--tags always" "# Check tasks that are 'always' run"
 
 # Test 'apt' tasks.
-run_test "003" "--tags apt"
+run_test "003" "--tags apt" "# Check apt execution order"
+
+# Test docker install execution order.
+run_test "004" "--tags docker" "# Check docker installation steps"
+
+# Test keyrings are configured in the right order.
+run_test "005" "--tags keyring" "# Check keyring installation order"
