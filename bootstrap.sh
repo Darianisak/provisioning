@@ -2,6 +2,12 @@
 
 set -e
 
+if [ -f .github-vars ]; then
+    echo -e "Running in CI - sourcing environment file..."
+    # shellcheck disable=SC1091
+    source .github-vars
+fi
+
 echo -e \ "\nbootstrap.sh: A slightly hacky script for system provisioning.\n"
 
 # Check release
@@ -12,15 +18,7 @@ DIST_CODENAME=$(lsb_release --short --codename 2>/dev/null)
 
 # FIXME - room for improvement using cURL to have distro specific version files,
 # similar to how we're dealing with Ansible requirements.
-if [ "${DIST_CODENAME}" == "bookworm" ]; then
-    echo -e "\nSetting up package versions for Debian Bookworm...\n"
-    GIT_VERSION="1:2.39.2-1.1"
-    PYTHON_VENV_VERSION="3.11.2-6"
-    CURL_VERSION="7.88.1-10+deb12u5"  # This SHOULD already be installed.
-else
-    echo -e "\nError! Current distro is not supported!\n"
-    exit 1
-fi
+echo -e "\nSetting up package versions for ${DIST_CODENAME}...\n"
 
 BASE_REPOSITORY_URL="https://raw.githubusercontent.com/Darianisak/provisioning"
 GIT_BRANCH="main"
@@ -31,11 +29,16 @@ if [ "$(whoami)" != "root" ]; then
     exit 1
 fi
 
-# FIXME - this could do with some input validation, given it's used for a regex
-read -rp "Username? " INPUT_USERNAME
+if [ -z "${INPUT_USERNAME}" ]; then
+    # FIXME - this could do with some input validation, given it's used for a regex
+    echo -e "'INPUT_USERNAME' not found in environment. Prompting..."
+    read -rp "Username? " INPUT_USERNAME
+fi
 
 if ! id --user "${INPUT_USERNAME}" 2>/dev/null ; then
+    USERS=$(cut -d: -f1 /etc/passwd)
     echo -e "\nError! User '${INPUT_USERNAME}' does not exist!\n"
+    echo -e "\nValid users are: ${USERS}\n"
     exit 1
 fi
 
@@ -50,8 +53,7 @@ echo -e "\nUpdating apt repositories and installing dependencies...\n"
 
 apt-get update && \
     apt-get install --assume-yes --no-install-recommends --auto-remove --quiet \
-    git="${GIT_VERSION}" curl="${CURL_VERSION}" \
-    python3.11-venv="${PYTHON_VENV_VERSION}"
+    git curl python3.11-venv python3-apt  # python3-apt for ansible-playbook --check
 
 mkdir --parents "/home/${INPUT_USERNAME}/code" && \
     mkdir --parents "/home/${INPUT_USERNAME}/venvs/ansible"
@@ -79,5 +81,4 @@ pip --require-virtualenv install --requirement \
     "/home/${INPUT_USER}/.ansible-requirements.txt"
 
 deactivate
-
 rm "/home/${INPUT_USER}/.ansible-requirements.txt"
