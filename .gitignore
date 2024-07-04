@@ -1,1 +1,2 @@
 .vscode
+integration-tests/tag-regressions/expected/.*.txt
