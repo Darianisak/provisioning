@@ -1,6 +1,6 @@
 ---
 name: Ansible Tests
-on: [ push, pull_request ]
+on: [push, pull_request]
 
 jobs:
   tagcheck:
@@ -10,13 +10,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # FIXME - there must be a more native way to transport environment variables
-      # between env.vars and the bash script environment.
+      # FIXME - there must be a more native way to transport environment
+      # variables between env.vars and the bash script environment.
       - name: Provision environment variables to scripts.
         run: >
-          echo "INPUT_USERNAME=${INPUT_USERNAME}" >> .github-vars &&
-          echo "VIRTUAL_ENV=/home/${INPUT_USERNAME}/venvs/ansible" >> .github-vars &&
-          sudo chown 0600 .github-vars
+          echo "INPUT_USERNAME=${INPUT_USERNAME}" >> .github-vars
+          && echo "VIRTUAL_ENV=/home/${INPUT_USERNAME}/venvs/ansible"
+          >> .github-vars
+          && sudo chown 0600 .github-vars
 
       - name: Run bootstrap script.
         run: sudo ./bootstrap.sh
