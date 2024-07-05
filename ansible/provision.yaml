@@ -85,10 +85,38 @@
           - docker-compose-plugin
       tags: ['apt', 'docker']
 
-    # configure codium
+    - name: Install Spotify keyring
+      ansible.builtin.get_url:
+        url: "https://download.spotify.com/debian/pubkey_6224F9941A8AA6D1.gpg"
+        owner: root
+        group: root
+        mode: "0644"
+        dest: /etc/apt/keyrings/spotify.asc
+      tags: ['keyring', 'spotify']
 
-    # spotify
+    - name: Setup Spotify source
+      ansible.builtin.template:
+        src: templates/spotify-source.j2
+        dest: /etc/apt/sources.list.d/spotify.list
+        owner: root
+        group: root
+        mode: "0644"
+      tags: ['source', 'spotify']
+
+    - name: Install Spotify
+      ansible.builtin.apt:
+        clean: true
+        update_cache: true
+        install_recommends: false
+        name:
+          - spotify-client
+      tags: ['apt', 'spotify']
+
+    # configure codium
+      # key
+      # apt install
+      # extensions
+      # themes
+      # keybindings
 
     # steam
-
-    # - name:

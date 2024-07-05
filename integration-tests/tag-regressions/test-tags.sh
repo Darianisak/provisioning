@@ -71,3 +71,6 @@ run_test "004" "--tags docker" "# Check docker installation steps"
 
 # Test keyrings are configured in the right order.
 run_test "005" "--tags keyring" "# Check keyring installation order"
+
+# Test spotify install execution order.
+run_test "006" "--tags spotify" "# Check spotify installation steps"
