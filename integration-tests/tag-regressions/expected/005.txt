@@ -11,3 +11,4 @@ playbook: ansible/provision.yaml
       Create keyrings directory	TAGS: [always, apt, keyring]
       Install Docker keyring	TAGS: [docker, keyring]
       Install Spotify keyring	TAGS: [keyring, spotify]
+      Install Codium keyring	TAGS: [codium, keyring]

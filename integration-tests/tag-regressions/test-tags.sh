@@ -74,3 +74,10 @@ run_test "005" "--tags keyring" "# Check keyring installation order"
 
 # Test spotify install execution order.
 run_test "006" "--tags spotify" "# Check spotify installation steps"
+
+# Test Codium install order.
+run_test "007" "--tags codium" "# Check Codium installation steps"
+
+run_test "008" "--tags extensions" "# Check Codium extension steps"
+
+run_test "009" "--tags settings" "# Check Codium settings steps"
