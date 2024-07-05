@@ -21,7 +21,8 @@
       tags: ['always', 'os_family']
 
     # FIXME - consider this for managing users on init?
-    #   https://docs.ansible.com/ansible/latest/collections/ansible/builtin/user_module.html
+    # https://docs.ansible.com/ansible/latest/collections/ansible \
+    # /builtin/user_module.html
 
     - name: Update apt-cache
       ansible.builtin.apt:
@@ -118,7 +119,9 @@
 
     - name: Install Codium keyring
       ansible.builtin.get_url:
-        url: "https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master/pub.gpg"
+        url:
+          "https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/\
+          raw/master/pub.gpg"
         owner: root
         group: root
         mode: "0644"
@@ -195,7 +198,7 @@
       ansible.builtin.command:
         cmd: codium --install-extension {{ item }}
       register: extension_install_process
-      with_items: "{{ extensions_to_install.stdout_lines | difference(installed_extensions.stdout_lines) }}"
+      with_items: "{{ extensions_to_install.stdout_lines | difference(installed_extensions.stdout_lines) }}" # yamllint disable-line rule:line-length
       changed_when: extension_install_process.rc == 0
       tags: ['codium', 'extensions']
 
