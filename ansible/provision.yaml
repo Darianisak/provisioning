@@ -1,13 +1,13 @@
 ---
-# FIXME - should provide mechanism to run this in Docker via script.
-
 - name: Provision system
   hosts: localhost
   gather_facts: true
   become: true
   become_user: root
   any_errors_fatal: true
-  # debugger: 'always'
+  vars:
+    system_user: darianculver  # Change this line as needed.
+  debugger: 'on_failed'  # Toggle as needed.
 
   pre_tasks:
 
@@ -19,6 +19,9 @@
         fail_msg: "Error! '{{ ansible_facts.os_family }}' is not supported!"
         success_msg: "'{{ ansible_facts.os_family }}' is supported."
       tags: ['always', 'os_family']
+
+    # FIXME - consider this for managing users on init?
+    #   https://docs.ansible.com/ansible/latest/collections/ansible/builtin/user_module.html
 
     - name: Update apt-cache
       ansible.builtin.apt:
