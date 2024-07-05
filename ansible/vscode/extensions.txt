@@ -1,0 +1,14 @@
+redhat.ansible
+teabyii.ayu
+streetsidesoftware.code-spell-checker
+shardulm94.trailing-spaces
+kevinrose.vsc-python-indent
+ms-python.pylint
+ms-python.flake8
+exiasr.hadolint
+timonwong.shellcheck
+ms-azuretools.vscode-docker
+ms-python.debugpy
+redhat.vscode-yaml
+eamodio.gitlens
+ms-python.python

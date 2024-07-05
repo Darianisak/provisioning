@@ -22,3 +22,8 @@ Run the test suite:
 
 Provision a system:
 `ansible-playbook provision.yaml -K`
+
+
+Create a basic system user account for validating ownership, etc. (interactive)
+    N.B. Maybe investigate the Ansible user module?
+`sudo adduser $NAME`
