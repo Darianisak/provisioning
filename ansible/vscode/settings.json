@@ -1,0 +1,33 @@
+{
+    "workbench.colorCustomizations": {
+
+    },
+    "workbench.colorTheme": "Ayu Dark",
+    "workbench.iconTheme": "ayu",
+    "redhat.telemetry.enabled": false,
+    "files.associations": {
+        "*.yml": "yaml"
+    },
+    "yaml.customTags": [
+        "!reference sequence"
+    ],
+    "[yaml]": {
+
+        "editor.insertSpaces": true,
+        "editor.tabSize": 2,
+        "editor.autoIndent": "keep",
+        "diffEditor.ignoreTrimWhitespace": false,
+        "editor.quickSuggestions": {
+            "other": true,
+            "comments": false,
+            "strings": true
+        }
+    },
+    "workbench.sideBar.location": "right",
+    "terminal.integrated.defaultProfile.linux": "bash",
+    "editor.minimap.enabled": false,
+    "[python]": {
+        "diffEditor.ignoreTrimWhitespace": false
+    },
+    "gitlens.ai.experimental.generateCommitMessage.enabled": false
+}
