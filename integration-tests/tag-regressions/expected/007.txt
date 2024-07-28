@@ -10,7 +10,7 @@ playbook: ansible/provision.yaml
       Install packages from default repositories	TAGS: [always, apt, install]
       Create keyrings directory	TAGS: [always, apt, keyring]
       Install Codium keyring	TAGS: [codium, keyring]
-      Setup Codium source	TAGS: [codium, source]
+      Setup Codium source	TAGS: [apt, codium, source]
       Install Codium	TAGS: [apt, codium]
       Ensure Codium config directory tree is present	TAGS: [codium, settings]
       Install Codium settings	TAGS: [codium, settings]

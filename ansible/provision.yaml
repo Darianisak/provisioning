@@ -75,7 +75,7 @@
         owner: root
         group: root
         mode: "0644"
-      tags: ['source', 'docker']
+      tags: ['source', 'apt', 'docker']
 
     - name: Install Docker
       ansible.builtin.apt:
@@ -106,7 +106,7 @@
         owner: root
         group: root
         mode: "0644"
-      tags: ['source', 'spotify']
+      tags: ['source', 'apt', 'spotify']
 
     - name: Install Spotify
       ansible.builtin.apt:
@@ -135,7 +135,7 @@
         owner: root
         group: root
         mode: "0644"
-      tags: ['source', 'codium']
+      tags: ['source', 'apt', 'codium']
 
     - name: Install Codium
       ansible.builtin.apt:
