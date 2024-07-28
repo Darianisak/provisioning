@@ -201,4 +201,32 @@
       changed_when: extension_install_process.rc == 0
       tags: ['codium', 'extensions']
 
-    # steam
+    - name: Install nVidia prerequisite drivers
+      become: true
+      ansible.builtin.apt:
+        clean: true
+        update_cache: true
+        install_recommends: false
+        name:
+          - linux-headers-amd64
+      tags: ['nvidia', 'apt']
+
+    - name: Replace apt sources.list for nVidia drivers
+      ansible.builtin.template:
+        src: templates/sources.j2
+        dest: /etc/apt/sources.list
+        owner: root
+        group: root
+        mode: "0644"
+      tags: ['source', 'apt', 'nvidia']
+
+    - name: Install nVidia drivers
+      become: true
+      ansible.builtin.apt:
+        clean: true
+        update_cache: true
+        install_recommends: true  # Probably shouldn't mess around with GPU drivers...
+        name:
+          - nvidia-driver=535.183.01-1~deb12u1  # Would be nice to pin releases.
+          - firmware-misc-nonfree=20230210-5
+      tags: ['nvidia', 'apt']

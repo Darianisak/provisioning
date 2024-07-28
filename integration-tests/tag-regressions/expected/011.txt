@@ -1,4 +1,4 @@
-Test 003 - # Check apt execution order
+Test 011 - # Check nVidia installation order
 
 
 playbook: ansible/provision.yaml
@@ -7,12 +7,8 @@ playbook: ansible/provision.yaml
     tasks:
       Check if 'os_family' is supported	TAGS: [always, os_family]
       Update apt-cache	TAGS: [always, apt, cache]
-      Upgrade default packages	TAGS: [apt, upgrade]
       Install packages from default repositories	TAGS: [always, apt, install]
       Create keyrings directory	TAGS: [always, apt, keyring]
-      Install Docker	TAGS: [apt, docker]
-      Install Spotify	TAGS: [apt, spotify]
-      Install Codium	TAGS: [apt, codium]
       Install nVidia prerequisite drivers	TAGS: [apt, nvidia]
       Replace apt sources.list for nVidia drivers	TAGS: [apt, nvidia, source]
       Install nVidia drivers	TAGS: [apt, nvidia]

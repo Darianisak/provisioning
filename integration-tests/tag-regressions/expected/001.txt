@@ -25,3 +25,6 @@ playbook: ansible/provision.yaml
       Determine installed Codium extensions	TAGS: [codium, extensions]
       Determine Codium extensions to install	TAGS: [codium, extensions]
       Install required Codium extensions	TAGS: [codium, extensions]
+      Install nVidia prerequisite drivers	TAGS: [apt, nvidia]
+      Replace apt sources.list for nVidia drivers	TAGS: [apt, nvidia, source]
+      Install nVidia drivers	TAGS: [apt, nvidia]
