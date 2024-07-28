@@ -197,7 +197,7 @@
       ansible.builtin.command:
         cmd: codium --install-extension {{ item }}
       register: extension_install_process
-      with_items: "{{ extensions_to_install.stdout_lines | difference(installed_extensions.stdout_lines) }}" # yamllint disable-line rule:line-length
+      with_items: "{{ extensions_to_install.stdout_lines | difference(installed_extensions.stdout_lines) }}"  # yamllint disable-line rule:line-length
       changed_when: extension_install_process.rc == 0
       tags: ['codium', 'extensions']
 
@@ -225,7 +225,7 @@
       ansible.builtin.apt:
         clean: true
         update_cache: true
-        install_recommends: true  # Probably shouldn't mess around with GPU drivers...
+        install_recommends: true  # Just install defaults - risky install.
         name:
           - nvidia-driver=535.183.01-1~deb12u1  # Would be nice to pin releases.
           - firmware-misc-nonfree=20230210-5
