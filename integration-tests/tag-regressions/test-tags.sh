@@ -81,3 +81,9 @@ run_test "007" "--tags codium" "# Check Codium installation steps"
 run_test "008" "--tags extensions" "# Check Codium extension steps"
 
 run_test "009" "--tags settings" "# Check Codium settings steps"
+
+# Test apt list order.
+run_test "010" "--tags source" "# Check source file maniuplation order"
+
+# Test nVidia installation order
+run_test "011" "--tags nvidia" "# Check nVidia installation order"

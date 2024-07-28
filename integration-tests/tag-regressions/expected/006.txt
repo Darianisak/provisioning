@@ -10,5 +10,5 @@ playbook: ansible/provision.yaml
       Install packages from default repositories	TAGS: [always, apt, install]
       Create keyrings directory	TAGS: [always, apt, keyring]
       Install Spotify keyring	TAGS: [keyring, spotify]
-      Setup Spotify source	TAGS: [source, spotify]
+      Setup Spotify source	TAGS: [apt, source, spotify]
       Install Spotify	TAGS: [apt, spotify]

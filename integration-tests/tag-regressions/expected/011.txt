@@ -1,4 +1,4 @@
-Test 004 - # Check docker installation steps
+Test 011 - # Check nVidia installation order
 
 
 playbook: ansible/provision.yaml
@@ -9,6 +9,6 @@ playbook: ansible/provision.yaml
       Update apt-cache	TAGS: [always, apt, cache]
       Install packages from default repositories	TAGS: [always, apt, install]
       Create keyrings directory	TAGS: [always, apt, keyring]
-      Install Docker keyring	TAGS: [docker, keyring]
-      Setup Docker source	TAGS: [apt, docker, source]
-      Install Docker	TAGS: [apt, docker]
+      Install nVidia prerequisite drivers	TAGS: [apt, nvidia]
+      Replace apt sources.list for nVidia drivers	TAGS: [apt, nvidia, source]
+      Install nVidia drivers	TAGS: [apt, nvidia]
