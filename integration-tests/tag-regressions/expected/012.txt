@@ -1,4 +1,4 @@
-Test 010 - # Check source file maniuplation order
+Test 012 - # Check configuration order of i386
 
 
 playbook: ansible/provision.yaml
@@ -9,7 +9,5 @@ playbook: ansible/provision.yaml
       Update apt-cache	TAGS: [always, apt, cache]
       Install packages from default repositories	TAGS: [always, apt, install]
       Create keyrings directory	TAGS: [always, apt, keyring]
-      Setup Docker source	TAGS: [apt, docker, source]
-      Setup Spotify source	TAGS: [apt, source, spotify]
-      Setup Codium source	TAGS: [apt, codium, source]
-      Replace apt sources.list for nVidia drivers	TAGS: [apt, nvidia, source, steam]
+      Check configured dpkg architectures	TAGS: [apt, dpkg, i386, steam]
+      Configure i386 as a valid architecture	TAGS: [apt, dpkg, i386, steam]

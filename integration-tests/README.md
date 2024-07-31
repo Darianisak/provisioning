@@ -27,3 +27,11 @@ Provision a system:
 Create a basic system user account for validating ownership, etc. (interactive)
     N.B. Maybe investigate the Ansible user module?
 `sudo adduser $NAME`
+
+
+Ansible debugger:
+https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_debugger.html#resolving-errors-in-the-debugger
+
+`p task_vars` for variables
+
+`p result._result` for job output

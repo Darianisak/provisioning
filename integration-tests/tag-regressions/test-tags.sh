@@ -87,3 +87,6 @@ run_test "010" "--tags source" "# Check source file maniuplation order"
 
 # Test nVidia installation order
 run_test "011" "--tags nvidia" "# Check nVidia installation order"
+
+# Test dpkg i386 configuration order
+run_test "012" "--tags i386" "# Check configuration order of i386"

@@ -209,7 +209,7 @@
         install_recommends: false
         name:
           - linux-headers-amd64
-      tags: ['nvidia', 'apt']
+      tags: ['nvidia', 'apt', 'steam']
 
     - name: Replace apt sources.list for nVidia drivers
       ansible.builtin.template:
@@ -218,7 +218,7 @@
         owner: root
         group: root
         mode: "0644"
-      tags: ['source', 'apt', 'nvidia']
+      tags: ['source', 'apt', 'nvidia', 'steam']
 
     - name: Install nVidia drivers
       become: true
@@ -229,4 +229,23 @@
         name:
           - nvidia-driver=535.183.01-1~deb12u1  # Would be nice to pin releases.
           - firmware-misc-nonfree=20230210-5
-      tags: ['nvidia', 'apt']
+      tags: ['nvidia', 'apt', 'steam']
+
+    - name: Check configured dpkg architectures
+      debugger: 'always'
+      become: true
+      ansible.builtin.command:
+        cmd: dpkg --print-foreign-architectures
+      register: configured_architectures
+      changed_when: configured_architectures.rc == 0
+      tags: ['steam', 'apt', 'dpkg', 'i386']
+
+    - name: Configure i386 as a valid architecture
+      debugger: 'always'
+      become: true
+      ansible.builtin.command:
+        cmd: dpkg --add-architecture i386
+      register: dpkg_architectures
+      when: "'i386' not in configured_architectures.stdout_lines"
+      changed_when: dpkg_architectures.rc == 0
+      tags: ['steam', 'apt', 'dpkg', 'i386']
