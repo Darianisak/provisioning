@@ -24,6 +24,23 @@
     # https://docs.ansible.com/ansible/latest/collections/ansible \
     # /builtin/user_module.html
 
+    - name: Check configured dpkg architectures
+      become: true
+      ansible.builtin.command:
+        cmd: dpkg --print-foreign-architectures
+      register: configured_architectures
+      changed_when: configured_architectures.rc == 0
+      tags: ['always', 'apt']
+
+    - name: Configure i386 as a valid architecture
+      become: true
+      ansible.builtin.command:
+        cmd: dpkg --add-architecture i386
+      register: dpkg_architectures
+      when: "'i386' not in configured_architectures.stdout_lines"
+      changed_when: dpkg_architectures.rc == 0
+      tags: ['always', 'apt']
+
     - name: Update apt-cache
       ansible.builtin.apt:
         clean: true
@@ -231,23 +248,6 @@
           - nvidia-driver=535.183.01-1~deb12u1  # Would be nice to pin releases.
           - firmware-misc-nonfree=20230210-5
       tags: ['nvidia', 'apt', 'steam']
-
-    - name: Check configured dpkg architectures
-      become: true
-      ansible.builtin.command:
-        cmd: dpkg --print-foreign-architectures
-      register: configured_architectures
-      changed_when: configured_architectures.rc == 0
-      tags: ['steam', 'apt', 'dpkg', 'i386']
-
-    - name: Configure i386 as a valid architecture
-      become: true
-      ansible.builtin.command:
-        cmd: dpkg --add-architecture i386
-      register: dpkg_architectures
-      when: "'i386' not in configured_architectures.stdout_lines"
-      changed_when: dpkg_architectures.rc == 0
-      tags: ['steam', 'apt', 'dpkg', 'i386']
 
     - name: Install Vulkan/32-bit dependencies
       become: true
