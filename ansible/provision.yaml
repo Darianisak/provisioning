@@ -246,7 +246,7 @@
         install_recommends: true  # Just install defaults - risky install.
         name:
           - nvidia-driver=535.183.01-1~deb12u1  # Would be nice to pin releases.
-          - firmware-misc-nonfree=20230210-5
+          - nvidia-driver-libs:i386=535.183.01-1~deb12u1
       tags: ['nvidia', 'apt', 'steam']
 
     - name: Install Vulkan/32-bit dependencies
@@ -260,6 +260,7 @@
           - libglx-mesa0:i386
           - mesa-vulkan-drivers:i386
           - libgl1-mesa-dri:i386
+          - libgl1-mesa-glx:i386
       tags: ['apt', 'steam', 'vulkan']
 
     - name: Install Steam
