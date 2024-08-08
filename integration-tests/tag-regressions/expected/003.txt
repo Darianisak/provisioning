@@ -6,6 +6,8 @@ playbook: ansible/provision.yaml
   play #1 (localhost): Provision system	TAGS: []
     tasks:
       Check if 'os_family' is supported	TAGS: [always, os_family]
+      Check configured dpkg architectures	TAGS: [always, apt]
+      Configure i386 as a valid architecture	TAGS: [always, apt]
       Update apt-cache	TAGS: [always, apt, cache]
       Upgrade default packages	TAGS: [apt, upgrade]
       Install packages from default repositories	TAGS: [always, apt, install]
@@ -19,7 +21,5 @@ playbook: ansible/provision.yaml
       Install nVidia prerequisite drivers	TAGS: [apt, nvidia, steam]
       Replace apt sources.list for nVidia drivers	TAGS: [apt, nvidia, source, steam]
       Install nVidia drivers	TAGS: [apt, nvidia, steam]
-      Check configured dpkg architectures	TAGS: [apt, dpkg, i386, steam]
-      Configure i386 as a valid architecture	TAGS: [apt, dpkg, i386, steam]
       Install Vulkan/32-bit dependencies	TAGS: [apt, steam, vulkan]
       Install Steam	TAGS: [apt, steam]
