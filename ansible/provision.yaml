@@ -77,7 +77,7 @@
         mode: "0644"
       tags: ['source', 'apt', 'docker']
 
-    - name: Install Docker
+    - name: Install Docker  # FIXME - `sudo usermod -aG docker $USER`
       ansible.builtin.apt:
         clean: true
         update_cache: true
@@ -211,6 +211,7 @@
           - linux-headers-amd64
       tags: ['nvidia', 'apt', 'steam']
 
+    # FIXME - can result in duplicate apt source warnings
     - name: Replace apt sources.list for nVidia drivers
       ansible.builtin.template:
         src: templates/sources.j2
@@ -232,7 +233,6 @@
       tags: ['nvidia', 'apt', 'steam']
 
     - name: Check configured dpkg architectures
-      debugger: 'always'
       become: true
       ansible.builtin.command:
         cmd: dpkg --print-foreign-architectures
@@ -241,7 +241,6 @@
       tags: ['steam', 'apt', 'dpkg', 'i386']
 
     - name: Configure i386 as a valid architecture
-      debugger: 'always'
       become: true
       ansible.builtin.command:
         cmd: dpkg --add-architecture i386

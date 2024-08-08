@@ -12,7 +12,7 @@ echo -e \ "\nbootstrap.sh: A slightly hacky script for system provisioning.\n"
 
 # Check release
 apt-get update && apt-get install --assume-yes --no-install-recommends \
-    --auto-remove --quiet lsb-release
+    --auto-remove --quiet lsb-release sudo
 
 DIST_CODENAME=$(lsb_release --short --codename 2>/dev/null)
 
