@@ -57,33 +57,28 @@ function run_test() {
 
 echo -e "\nRunning Naive regression tests...\n\n"
 
-# Test 'default' tasks.
 run_test "001" " " "# Check the 'default' provisioning order"
 
-# Test 'always' tasks.
 run_test "002" "--tags always" "# Check tasks that are 'always' run"
 
-# Test 'apt' tasks.
 run_test "003" "--tags apt" "# Check apt execution order"
 
-# Test docker install execution order.
 run_test "004" "--tags docker" "# Check docker installation steps"
 
-# Test keyrings are configured in the right order.
 run_test "005" "--tags keyring" "# Check keyring installation order"
 
-# Test spotify install execution order.
 run_test "006" "--tags spotify" "# Check spotify installation steps"
 
-# Test Codium install order.
 run_test "007" "--tags codium" "# Check Codium installation steps"
 
 run_test "008" "--tags extensions" "# Check Codium extension steps"
 
 run_test "009" "--tags settings" "# Check Codium settings steps"
 
-# Test apt list order.
 run_test "010" "--tags source" "# Check source file maniuplation order"
 
-# Test nVidia installation order
 run_test "011" "--tags nvidia" "# Check nVidia installation order"
+
+run_test "012" "--tags i386" "# Check configuration order of i386"
+
+run_test "013" "--tags steam" "# Check configuration order for Steam"

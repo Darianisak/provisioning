@@ -77,7 +77,7 @@
         mode: "0644"
       tags: ['source', 'apt', 'docker']
 
-    - name: Install Docker
+    - name: Install Docker  # FIXME - `sudo usermod -aG docker $USER`
       ansible.builtin.apt:
         clean: true
         update_cache: true
@@ -209,8 +209,9 @@
         install_recommends: false
         name:
           - linux-headers-amd64
-      tags: ['nvidia', 'apt']
+      tags: ['nvidia', 'apt', 'steam']
 
+    # FIXME - can result in duplicate apt source warnings
     - name: Replace apt sources.list for nVidia drivers
       ansible.builtin.template:
         src: templates/sources.j2
@@ -218,7 +219,7 @@
         owner: root
         group: root
         mode: "0644"
-      tags: ['source', 'apt', 'nvidia']
+      tags: ['source', 'apt', 'nvidia', 'steam']
 
     - name: Install nVidia drivers
       become: true
@@ -229,4 +230,44 @@
         name:
           - nvidia-driver=535.183.01-1~deb12u1  # Would be nice to pin releases.
           - firmware-misc-nonfree=20230210-5
-      tags: ['nvidia', 'apt']
+      tags: ['nvidia', 'apt', 'steam']
+
+    - name: Check configured dpkg architectures
+      become: true
+      ansible.builtin.command:
+        cmd: dpkg --print-foreign-architectures
+      register: configured_architectures
+      changed_when: configured_architectures.rc == 0
+      tags: ['steam', 'apt', 'dpkg', 'i386']
+
+    - name: Configure i386 as a valid architecture
+      become: true
+      ansible.builtin.command:
+        cmd: dpkg --add-architecture i386
+      register: dpkg_architectures
+      when: "'i386' not in configured_architectures.stdout_lines"
+      changed_when: dpkg_architectures.rc == 0
+      tags: ['steam', 'apt', 'dpkg', 'i386']
+
+    - name: Install Vulkan/32-bit dependencies
+      become: true
+      ansible.builtin.apt:
+        clean: true
+        update_cache: true
+        install_recommends: false
+        name:
+          - mesa-vulkan-drivers
+          - libglx-mesa0:i386
+          - mesa-vulkan-drivers:i386
+          - libgl1-mesa-dri:i386
+      tags: ['apt', 'steam', 'vulkan']
+
+    - name: Install Steam
+      become: true
+      ansible.builtin.apt:
+        clean: true
+        update_cache: true
+        install_recommends: false
+        name:
+          - steam-installer
+      tags: ['apt', 'steam']
