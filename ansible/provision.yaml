@@ -248,3 +248,26 @@
       when: "'i386' not in configured_architectures.stdout_lines"
       changed_when: dpkg_architectures.rc == 0
       tags: ['steam', 'apt', 'dpkg', 'i386']
+
+    - name: Install Vulkan/32-bit dependencies
+      become: true
+      ansible.builtin.apt:
+        clean: true
+        update_cache: true
+        install_recommends: false
+        name:
+          - mesa-vulkan-drivers
+          - libglx-mesa0:i386
+          - mesa-vulkan-drivers:i386
+          - libgl1-mesa-dri:i386
+      tags: ['apt', 'steam', 'vulkan']
+
+    - name: Install Steam
+      become: true
+      ansible.builtin.apt:
+        clean: true
+        update_cache: true
+        install_recommends: false
+        name:
+          - steam-installer
+      tags: ['apt', 'steam']
