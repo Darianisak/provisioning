@@ -7,7 +7,7 @@
   any_errors_fatal: true
   vars:
     system_user: darianculver  # Change this line as needed.
-  debugger: 'on_failed'  # Toggle as needed.
+  debugger: 'on_failed'
 
   pre_tasks:
 

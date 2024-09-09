@@ -27,6 +27,7 @@ EXPECTED_DIR="integration-tests/tag-regressions/expected"
 
 if ! touch "${EXPECTED_DIR}/.00X.txt" 2>/dev/null ; then
     echo -e "\nError! Can't write tempfiles to ${EXPECTED_DIR}\n"
+    echo "Are you in the project root?"
     exit 1
 else
     rm "${EXPECTED_DIR}/.00X.txt"
