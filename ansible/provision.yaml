@@ -20,6 +20,15 @@
         success_msg: "'{{ ansible_facts.os_family }}' is supported."
       tags: ['always', 'os_family']
 
+    - name: Check system_user exists
+      debugger: always
+      ansible.builtin.command:
+        cmd: id {{ system_user }}
+      register: user_state
+      changed_when: user_state.rc
+      failed_when: user_state.rc != 0
+      tags: ['always', 'user']
+
     # FIXME - consider this for managing users on init?
     # https://docs.ansible.com/ansible/latest/collections/ansible \
     # /builtin/user_module.html
@@ -94,7 +103,7 @@
         mode: "0644"
       tags: ['source', 'apt', 'docker']
 
-    - name: Install Docker  # FIXME - `sudo usermod -aG docker $USER`
+    - name: Install Docker
       ansible.builtin.apt:
         clean: true
         update_cache: true
@@ -106,6 +115,14 @@
           - docker-buildx-plugin
           - docker-compose-plugin
       tags: ['apt', 'docker']
+
+    - name: Add user to the Docker group
+      become: true
+      ansible.builtin.command:
+        cmd: usermod -aG docker {{ system_user }}
+      register: docker_usermod
+      changed_when: docker_usermod.rc == 0
+      tags: ['apt', 'docker', 'user']
 
     - name: Install Spotify keyring
       ansible.builtin.get_url:
