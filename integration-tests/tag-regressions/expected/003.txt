@@ -6,6 +6,7 @@ playbook: ansible/provision.yaml
   play #1 (localhost): Provision system	TAGS: []
     tasks:
       Check if 'os_family' is supported	TAGS: [always, os_family]
+      Check system_user exists	TAGS: [always, user]
       Check configured dpkg architectures	TAGS: [always, apt]
       Configure i386 as a valid architecture	TAGS: [always, apt]
       Update apt-cache	TAGS: [always, apt, cache]
@@ -14,6 +15,7 @@ playbook: ansible/provision.yaml
       Create keyrings directory	TAGS: [always, apt, keyring]
       Setup Docker source	TAGS: [apt, docker, source]
       Install Docker	TAGS: [apt, docker]
+      Add user to the Docker group	TAGS: [apt, docker, user]
       Setup Spotify source	TAGS: [apt, source, spotify]
       Install Spotify	TAGS: [apt, spotify]
       Setup Codium source	TAGS: [apt, codium, source]
@@ -23,3 +25,5 @@ playbook: ansible/provision.yaml
       Install nVidia drivers	TAGS: [apt, nvidia, steam]
       Install Vulkan/32-bit dependencies	TAGS: [apt, steam, vulkan]
       Install Steam	TAGS: [apt, steam]
+      Check if using gnome	TAGS: [apt, gnome]
+      Set up Dashboard favorites	TAGS: [apt, gnome]

@@ -27,6 +27,7 @@ EXPECTED_DIR="integration-tests/tag-regressions/expected"
 
 if ! touch "${EXPECTED_DIR}/.00X.txt" 2>/dev/null ; then
     echo -e "\nError! Can't write tempfiles to ${EXPECTED_DIR}\n"
+    echo "Are you in the project root?"
     exit 1
 else
     rm "${EXPECTED_DIR}/.00X.txt"
@@ -82,3 +83,7 @@ run_test "011" "--tags nvidia" "# Check nVidia installation order"
 run_test "012" "--tags i386" "# Check configuration order of i386"
 
 run_test "013" "--tags steam" "# Check configuration order for Steam"
+
+run_test "014" "--tags git" "# Check git configuration order."
+
+run_test "015" "--tags gnome" "# Check gnome configuration order."

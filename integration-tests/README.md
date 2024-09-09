@@ -35,3 +35,16 @@ https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_debugger.html#r
 `p task_vars` for variables
 
 `p result._result` for job output
+
+`p task_vars['ansible_facts]` to 'drill down' into the `ansible_facts` for this host.
+
+```
+# Dumping all objects. Ansible debugger is just Python objects.
+# Wrap anything you want methods from with `dir()`
+
+[localhost] TASK: Check if using gnome (debug)> dir()
+['host', 'play_context', 'result', 'task', 'task_vars']
+
+dir(task)
+p dir(task)
+```

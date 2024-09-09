@@ -1,4 +1,4 @@
-Test 009 - # Check Codium settings steps
+Test 015 - # Check gnome configuration order.
 
 
 playbook: ansible/provision.yaml
@@ -12,6 +12,5 @@ playbook: ansible/provision.yaml
       Update apt-cache	TAGS: [always, apt, cache]
       Install packages from default repositories	TAGS: [always, apt, install]
       Create keyrings directory	TAGS: [always, apt, keyring]
-      Ensure Codium config directory tree is present	TAGS: [codium, settings]
-      Install Codium settings	TAGS: [codium, settings]
-      Install Codium keybindings	TAGS: [codium, settings]
+      Check if using gnome	TAGS: [apt, gnome]
+      Set up Dashboard favorites	TAGS: [apt, gnome]
