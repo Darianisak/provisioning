@@ -5,8 +5,10 @@
   become: true
   become_user: root
   any_errors_fatal: true
-  vars:
+  vars:  # FIXME; should have a pre_task for user provided values.
     system_user: darianculver  # Change this line as needed.
+    git_email: "culver.darian@gmail.com"
+    git_author: "Darian Culver"
   debugger: 'on_failed'
 
   pre_tasks:
@@ -289,3 +291,43 @@
         name:
           - steam-installer
       tags: ['apt', 'steam']
+
+    - name: Check if using gnome
+      ansible.builtin.command:
+        cmd: apt policy gnome
+      register: gnome_status
+      changed_when: gnome_status.rc == 0
+      tags: ['apt', 'gnome']
+
+    - name: Set up Dashboard favorites
+      vars:
+        check_string: "Installed: (none)"  # deal w/inline YAML tag (:).
+      ansible.builtin.command:
+        cmd: >-
+          gsettings set org.gnome.shell favorite-apps
+          "[
+          'org.gnome.Nautilus.desktop',
+          'firefox-esr.desktop',
+          'org.gnome.Terminal.desktop
+          'codium.desktop',
+          'steam.desktop'
+          ]"
+      register: dashboard_favorites
+      changed_when: dashboard_favorites.rc == 0
+      when: gnome_status.stdout_lines[1] | trim != check_string
+      tags: ['apt', 'gnome']
+
+    - name: Set up git config
+      tags: ['git']
+      block:  # FIXME; we should use the git module, but this works for now.
+        - name: Define username  # noqa: command-instead-of-module
+          ansible.builtin.command:
+            cmd: git config --global user.name "{{ git_author }}"
+          register: git_set_username
+          changed_when: git_set_username.rc == 0
+
+        - name: Define email  # noqa: command-instead-of-module
+          ansible.builtin.command:
+            cmd: git config --global user.email "{{ git_email }}"
+          register: git_set_email
+          changed_when: git_set_email.rc == 0

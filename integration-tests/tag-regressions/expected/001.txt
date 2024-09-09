@@ -34,3 +34,7 @@ playbook: ansible/provision.yaml
       Install nVidia drivers	TAGS: [apt, nvidia, steam]
       Install Vulkan/32-bit dependencies	TAGS: [apt, steam, vulkan]
       Install Steam	TAGS: [apt, steam]
+      Check if using gnome	TAGS: [apt, gnome]
+      Set up Dashboard favorites	TAGS: [apt, gnome]
+      Define username	TAGS: [git]
+      Define email	TAGS: [git]
