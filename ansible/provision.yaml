@@ -308,8 +308,9 @@
           "[
           'org.gnome.Nautilus.desktop',
           'firefox-esr.desktop',
-          'org.gnome.Terminal.desktop
+          'org.gnome.Terminal.desktop',
           'codium.desktop',
+          'spotify.desktop',
           'steam.desktop'
           ]"
       register: dashboard_favorites
