@@ -75,6 +75,8 @@
           - curl
           - dpkg
           - sudo  # Required for 'become' to work.
+          - jq
+          - yq
       tags: ['always', 'apt', 'install']
 
     - name: Create keyrings directory
