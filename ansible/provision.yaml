@@ -78,6 +78,7 @@
           - jq
           - yq
           - python3-pip
+          - keepassxc  # TODO - Need a solution for pull key dbs.
       tags: ['always', 'apt', 'install']
 
     - name: Create keyrings directory
@@ -314,7 +315,8 @@
           'org.gnome.Terminal.desktop',
           'codium.desktop',
           'spotify.desktop',
-          'steam.desktop'
+          'steam.desktop',
+          'org.keepassxc.KeePassXC.desktop'
           ]"
       register: dashboard_favorites
       changed_when: dashboard_favorites.rc == 0
