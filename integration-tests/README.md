@@ -21,7 +21,7 @@ Run the test suite:
 ```
 
 Provision a system:
-`ansible-playbook provision.yaml -K`
+`ansible-playbook provision.yaml -K --ask-vault-pass`
 
 
 Create a basic system user account for validating ownership, etc. (interactive)

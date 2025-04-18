@@ -1,4 +1,4 @@
-Test 015 - # Check gnome configuration order.
+Test 016 - # Check SSH configuration order.
 
 
 playbook: ansible/provision.yaml
@@ -11,7 +11,7 @@ playbook: ansible/provision.yaml
       Configure i386 as a valid architecture	TAGS: [always, apt]
       Update apt-cache	TAGS: [always, apt, cache]
       Ensure SSH directory exists	TAGS: [always, ssh]
+      Deploy Public	TAGS: [pub, ssh]
+      Deploy Private	TAGS: [priv, ssh]
       Install packages from default repositories	TAGS: [always, apt, install]
       Create keyrings directory	TAGS: [always, apt, keyring]
-      Check if using gnome	TAGS: [apt, gnome]
-      Set up Dashboard favorites	TAGS: [apt, gnome]

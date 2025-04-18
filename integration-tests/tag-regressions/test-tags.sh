@@ -87,3 +87,5 @@ run_test "013" "--tags steam" "# Check configuration order for Steam"
 run_test "014" "--tags git" "# Check git configuration order."
 
 run_test "015" "--tags gnome" "# Check gnome configuration order."
+
+run_test "016" "--tags ssh" "# Check SSH configuration order."
