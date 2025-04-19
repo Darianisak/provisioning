@@ -23,6 +23,8 @@
 
 # Note : Maybe should look at notifier for apt-cache update?
 - name: Setup Docker source
+  vars:
+    keyring_path: "{{ apt.keyring }}/docker.asc"
   ansible.builtin.template:
     src: templates/apt-source.j2
     dest: "{{ apt.sources }}/docker.list"

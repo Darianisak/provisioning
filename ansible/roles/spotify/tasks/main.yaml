@@ -1,0 +1,49 @@
+---
+
+- name: Check Spotify installation state
+  ansible.builtin.package_facts:
+    manager:
+      - apt
+  register: packages  # If installed, pretty safe to skip the other stuff.
+  tags:
+    - spotify
+
+- name: Setup Spotify
+  tags:
+    - spotify
+  when: "'spotify-client' not in packages['ansible_facts']['packages'].keys()"
+  block:
+    - name: Ensure keyring directory exists
+      ansible.builtin.file:
+        mode: "0755"
+        state: directory
+        owner: "{{ su_user }}"
+        group: "{{ su_group }}"
+        path: "{{ apt.keyring }}"
+
+    - name: Install Spotify keyring
+      ansible.builtin.get_url:
+        mode: "0644"
+        owner: "{{ su_user }}"
+        group: "{{ su_group }}"
+        url: >-
+          https://download.spotify.com/{{ ansible_facts.os_family | lower }}/pubkey_6224F9941A8AA6D1.gpg
+        dest: "{{ apt.keyring }}/spotify.asc"
+
+    - name: Setup Spotify source
+      vars:
+        keyring_path: "{{ apt.keyring }}/spotify.asc"
+      ansible.builtin.template:
+        src: templates/apt-source.j2
+        dest: "{{ apt.sources }}/spotify.list"
+        owner: "{{ su_user }}"
+        group: "{{ su_group }}"
+        mode: "0644"
+
+    - name: Install Spotify
+      ansible.builtin.apt:
+        clean: true
+        update_cache: true
+        install_recommends: false
+        name:
+          - spotify-client

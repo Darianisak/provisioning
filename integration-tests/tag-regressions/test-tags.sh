@@ -62,7 +62,7 @@ run_test "001" " " "# Check the 'default' provisioning order"
 
 run_test "002" "--tags always" "# Check tasks that are 'always' run"
 
-run_test "003" "--tags apt" "# Check apt execution order"
+# 003 - Not a value add within roles.
 
 run_test "004" "--tags docker" "# Check docker installation steps"
 
