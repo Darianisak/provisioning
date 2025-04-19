@@ -66,7 +66,7 @@ run_test "003" "--tags apt" "# Check apt execution order"
 
 run_test "004" "--tags docker" "# Check docker installation steps"
 
-run_test "005" "--tags keyring" "# Check keyring installation order"
+# 005 - Not a value add within roles.
 
 run_test "006" "--tags spotify" "# Check spotify installation steps"
 
@@ -76,7 +76,7 @@ run_test "008" "--tags extensions" "# Check Codium extension steps"
 
 run_test "009" "--tags settings" "# Check Codium settings steps"
 
-run_test "010" "--tags source" "# Check source file maniuplation order"
+# 010 - Not a value add within roles.
 
 run_test "011" "--tags nvidia" "# Check nVidia installation order"
 

@@ -1,0 +1,8 @@
+---
+apt:
+  keyring: "/etc/apt/keyrings"
+  sources: "/etc/apt/sources.list.d"
+
+su_user: root
+su_group: root
+docker_group: docker
