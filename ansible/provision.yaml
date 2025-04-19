@@ -116,33 +116,6 @@
         state: directory
       tags: ['always', 'apt', 'keyring']
 
-    - name: Install Spotify keyring
-      ansible.builtin.get_url:
-        url: "https://download.spotify.com/debian/pubkey_6224F9941A8AA6D1.gpg"
-        owner: root
-        group: root
-        mode: "0644"
-        dest: /etc/apt/keyrings/spotify.asc
-      tags: ['keyring', 'spotify']
-
-    - name: Setup Spotify source
-      ansible.builtin.template:
-        src: templates/spotify-source.j2
-        dest: /etc/apt/sources.list.d/spotify.list
-        owner: root
-        group: root
-        mode: "0644"
-      tags: ['source', 'apt', 'spotify']
-
-    - name: Install Spotify
-      ansible.builtin.apt:
-        clean: true
-        update_cache: true
-        install_recommends: false
-        name:
-          - spotify-client
-      tags: ['apt', 'spotify']
-
     - name: Install Codium keyring
       ansible.builtin.get_url:
         url:
@@ -325,3 +298,4 @@
           changed_when: git_set_email.rc == 0
   roles:
     - docker
+    - spotify
