@@ -5,19 +5,19 @@ This directory contains scripts for assisting with manually testing the system p
 ## Helper commands
 
 Checking what tasks are available in an Ansible playbook:
-`ansible-playbook $PLAYBOOK_FILE --list-tasks`
+`ansible-playbook $PLAYBOOK_FILE --list-tasks -K`
 
 Start Ansible from a specific task:
-`ansible-playbook $PLAYBOOK_FILE --start-at-task $TASK_NAME --verbose`
+`ansible-playbook $PLAYBOOK_FILE --start-at-task $TASK_NAME --verbose -K`
+
+Note: Password, `-K` is `foo` - defined in Dockerfile.
 
 Run the test suite:
 ```
 # Localhost
-./integration-tests/interactive-container.sh
+docker compose run --remove-orphans --build --interactive -t testing
 
-# In the container:
-./home/code/bootstrap.sh
-./home/code/integration-tests/tag-regressions/test-tags.sh
+./opt/integration-tests/tag-regressions/test-tags.sh
 ```
 
 Provision a system:

@@ -12,13 +12,8 @@ fi
 
 echo -e "\nA bash script for performing basic/naive regression tests execution order.\n"
 
-if [ -e "${VIRTUAL_ENV}" ]; then
-    if ! pip list | grep 'ansible-core' > /dev/null ; then
-        echo -e "\nError! 'ansible-core' not found!\n"
-        exit 1
-    fi
-else
-    echo -e "\nError! No venv sourced!\n"
+if ! pip list | grep 'ansible-core' > /dev/null ; then
+    echo -e "\nError! 'ansible-core' not found!\n"
     exit 1
 fi
 
