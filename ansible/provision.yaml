@@ -23,7 +23,6 @@
       tags: ['always', 'os_family']
 
     - name: Check system_user exists
-      debugger: always
       ansible.builtin.command:
         cmd: id {{ system_user }}
       register: user_state
@@ -116,46 +115,6 @@
         path: /etc/apt/keyrings
         state: directory
       tags: ['always', 'apt', 'keyring']
-
-    - name: Install Docker keyring
-      ansible.builtin.get_url:
-        url: "https://download.docker.com/linux/{{
-          ansible_facts.os_family | lower }}/gpg"
-        owner: root
-        group: root
-        mode: "0644"
-        dest: /etc/apt/keyrings/docker.asc
-      tags: ['keyring', 'docker']
-
-    - name: Setup Docker source
-      ansible.builtin.template:
-        src: templates/docker-source.j2
-        dest: /etc/apt/sources.list.d/docker.list
-        owner: root
-        group: root
-        mode: "0644"
-      tags: ['source', 'apt', 'docker']
-
-    - name: Install Docker
-      ansible.builtin.apt:
-        clean: true
-        update_cache: true
-        install_recommends: false
-        name:
-          - docker-ce
-          - docker-ce-cli
-          - containerd.io
-          - docker-buildx-plugin
-          - docker-compose-plugin
-      tags: ['apt', 'docker']
-
-    - name: Add user to the Docker group
-      become: true
-      ansible.builtin.command:
-        cmd: usermod -aG docker {{ system_user }}
-      register: docker_usermod
-      changed_when: docker_usermod.rc == 0
-      tags: ['apt', 'docker', 'user']
 
     - name: Install Spotify keyring
       ansible.builtin.get_url:
@@ -364,3 +323,5 @@
             cmd: git config --global user.email "{{ git_email }}"
           register: git_set_email
           changed_when: git_set_email.rc == 0
+  roles:
+    - docker
