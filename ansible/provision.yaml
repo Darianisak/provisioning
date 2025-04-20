@@ -63,37 +63,10 @@
       tags: ['apt', 'upgrade']
 
   tasks:
-
-    - name: Ensure SSH directory exists
-      ansible.builtin.file:
-        dest: "/home/{{ system_user }}/.ssh/"
-        group: "{{ system_user }}"
-        owner: "{{ system_user }}"
-        mode: "0700"
-        state: directory
-      tags: ['always', 'ssh']
-
-    - name: Deploy Public
-      ansible.builtin.copy:
-        src: vault/public
-        dest: "/home/{{ system_user }}/.ssh/id_rsa.pub"
-        group: "{{ system_user }}"
-        owner: "{{ system_user }}"
-        mode: "0644"
-      tags: ['ssh', 'pub']
-
-    - name: Deploy Private
-      ansible.builtin.copy:
-        src: vault/private
-        dest: "/home/{{ system_user }}/.ssh/id_rsa"
-        group: "{{ system_user }}"
-        owner: "{{ system_user }}"
-        mode: "0600"
-      tags: ['ssh', 'priv']
-
     - name: Install packages from default repositories
       ansible.builtin.apt:
         install_recommends: false
+        update_cache: true
         name:
           - git
           - vim
@@ -299,3 +272,4 @@
   roles:
     - docker
     - spotify
+    - keys

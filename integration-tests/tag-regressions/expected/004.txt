@@ -18,6 +18,5 @@ playbook: ansible/provision.yaml
       docker : Ensure expected users exists	TAGS: [docker]
       docker : Get user's current groups	TAGS: [docker]
       docker : Add user to Docker group, if required	TAGS: [docker]
-      Ensure SSH directory exists	TAGS: [always, ssh]
       Install packages from default repositories	TAGS: [always, apt, install]
       Create keyrings directory	TAGS: [always, apt, keyring]
