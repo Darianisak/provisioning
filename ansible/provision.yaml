@@ -66,6 +66,7 @@
     - name: Install packages from default repositories
       ansible.builtin.apt:
         install_recommends: false
+        update_cache: true
         name:
           - git
           - vim
