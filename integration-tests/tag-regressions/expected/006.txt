@@ -15,6 +15,5 @@ playbook: ansible/provision.yaml
       spotify : Install Spotify keyring	TAGS: [spotify]
       spotify : Setup Spotify source	TAGS: [spotify]
       spotify : Install Spotify	TAGS: [spotify]
-      Ensure SSH directory exists	TAGS: [always, ssh]
       Install packages from default repositories	TAGS: [always, apt, install]
       Create keyrings directory	TAGS: [always, apt, keyring]

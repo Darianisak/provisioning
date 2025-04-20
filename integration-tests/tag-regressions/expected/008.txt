@@ -10,7 +10,6 @@ playbook: ansible/provision.yaml
       Check configured dpkg architectures	TAGS: [always, apt]
       Configure i386 as a valid architecture	TAGS: [always, apt]
       Update apt-cache	TAGS: [always, apt, cache]
-      Ensure SSH directory exists	TAGS: [always, ssh]
       Install packages from default repositories	TAGS: [always, apt, install]
       Create keyrings directory	TAGS: [always, apt, keyring]
       Determine installed Codium extensions	TAGS: [codium, extensions]
