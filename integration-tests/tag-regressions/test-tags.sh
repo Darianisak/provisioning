@@ -55,7 +55,7 @@ echo -e "\nRunning Naive regression tests...\n\n"
 
 run_test "001" " " "# Check the 'default' provisioning order"
 
-run_test "002" "--tags always" "# Check tasks that are 'always' run"
+# 002 - Tags should not be used to define runtime order, so less value.
 
 # 003 - Not a value add within roles.
 
@@ -83,4 +83,4 @@ run_test "014" "--tags git" "# Check git configuration order."
 
 run_test "015" "--tags gnome" "# Check gnome configuration order."
 
-run_test "016" "--tags ssh" "# Check SSH configuration order."
+run_test "016" "--tags keys" "# Check SSH configuration order."
