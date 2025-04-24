@@ -1,0 +1,51 @@
+---
+# TODO to add contrib line to apt source.
+
+# TODO i386 as valid dpkg architecture
+  - name: Check configured dpkg architectures
+      become: true
+      ansible.builtin.command:
+        cmd: dpkg --print-foreign-architectures
+      register: configured_architectures
+      changed_when: configured_architectures.rc == 0
+      tags: ['always', 'apt']
+
+    - name: Configure i386 as a valid architecture
+      become: true
+      ansible.builtin.command:
+        cmd: dpkg --add-architecture i386
+      register: dpkg_architectures
+      when: "'i386' not in configured_architectures.stdout_lines"
+      changed_when: dpkg_architectures.rc == 0
+      tags: ['always', 'apt']
+
+
+
+- name: Check for installed packages
+  ansible.builtin.package_facts:
+    manager:
+      - apt
+  register: packages
+  tags:
+    - steam
+
+# ref: https://github.com/ValveSoftware/steam-for-linux/issues/7284#issuecomment-2275572518
+- name: Install Steam packages
+  vars:
+    steam_packages:
+      - steam-installer
+      - mesa-vulkan-drivers
+      - libglx-mesa0:i386
+      - mesa-vulkan-drivers:i386
+      - libgl1-mesa-dri:i386
+      - libgl1-mesa-glx:i386  # See linked issue.
+      - nvidia-driver-libs:i386  # See linked issue.
+  ansible.builtin.apt:
+    clean: true
+    update_cache: true
+    install_recommends: false
+    name:
+      - "{{ item }}"
+  with_items: "{{ steam_packages | difference(packages['ansible_facts']['packages'].keys()) }}"
+  tags:
+    - steam

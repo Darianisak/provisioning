@@ -204,29 +204,29 @@
           - nvidia-driver-libs:i386=535.183.01-1~deb12u1
       tags: ['nvidia', 'apt', 'steam']
 
-    - name: Install Vulkan/32-bit dependencies
-      become: true
-      ansible.builtin.apt:
-        clean: true
-        update_cache: true
-        install_recommends: false
-        name:
-          - mesa-vulkan-drivers
-          - libglx-mesa0:i386
-          - mesa-vulkan-drivers:i386
-          - libgl1-mesa-dri:i386
-          - libgl1-mesa-glx:i386
-      tags: ['apt', 'steam', 'vulkan']
+    # - name: Install Vulkan/32-bit dependencies
+    #   become: true
+    #   ansible.builtin.apt:
+    #     clean: true
+    #     update_cache: true
+    #     install_recommends: false
+    #     name:
+    #       - mesa-vulkan-drivers
+    #       - libglx-mesa0:i386
+    #       - mesa-vulkan-drivers:i386
+    #       - libgl1-mesa-dri:i386
+    #       - libgl1-mesa-glx:i386
+    #   tags: ['apt', 'steam', 'vulkan']
 
-    - name: Install Steam
-      become: true
-      ansible.builtin.apt:
-        clean: true
-        update_cache: true
-        install_recommends: false
-        name:
-          - steam-installer
-      tags: ['apt', 'steam']
+    # - name: Install Steam
+    #   become: true
+    #   ansible.builtin.apt:
+    #     clean: true
+    #     update_cache: true
+    #     install_recommends: false
+    #     name:
+    #       - steam-installer
+    #   tags: ['apt', 'steam']
 
     - name: Check if using gnome
       ansible.builtin.command:
@@ -273,3 +273,4 @@
     - docker
     - spotify
     - keys
+    - steam
