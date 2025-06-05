@@ -78,6 +78,8 @@
           - yq
           - python3-pip
           - keepassxc  # TODO - Need a solution for pull key dbs.
+          - default-jre # For minecraft
+          - libgdk-pixbuf2.0-0 # For minecraft
       tags: ['always', 'apt', 'install']
 
     - name: Create keyrings directory
