@@ -82,15 +82,6 @@
           - libgdk-pixbuf2.0-0 # For minecraft
       tags: ['always', 'apt', 'install']
 
-    - name: Create keyrings directory
-      ansible.builtin.file:
-        owner: root
-        group: root
-        mode: "0755"
-        path: /etc/apt/keyrings
-        state: directory
-      tags: ['always', 'apt', 'keyring']
-
     - name: Install nVidia prerequisite drivers
       become: true
       ansible.builtin.apt:
