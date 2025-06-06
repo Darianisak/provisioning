@@ -55,23 +55,11 @@ echo -e "\nRunning Naive regression tests...\n\n"
 
 run_test "001" " " "# Check the 'default' provisioning order"
 
-# 002 - Tags should not be used to define runtime order, so less value.
-
-# 003 - Not a value add within roles.
-
 run_test "004" "--tags docker" "# Check docker installation steps"
-
-# 005 - Not a value add within roles.
 
 run_test "006" "--tags spotify" "# Check spotify installation steps"
 
 run_test "007" "--tags codium" "# Check Codium installation steps"
-
-run_test "008" "--tags extensions" "# Check Codium extension steps"
-
-run_test "009" "--tags settings" "# Check Codium settings steps"
-
-# 010 - Not a value add within roles.
 
 run_test "011" "--tags nvidia" "# Check nVidia installation order"
 

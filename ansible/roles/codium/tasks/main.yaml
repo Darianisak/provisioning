@@ -1,0 +1,170 @@
+---
+
+- name: Check for installed Codium
+  ansible.builtin.package_facts:
+    manager:
+      - apt
+  register: packages
+  tags:
+    - codium
+
+# If the package is installed, it seems a safe bet that the keyring, etc., are
+# also installed.
+#
+# The package being installed does not, however, indicate that user config and
+# extensions are set up, so we'll deal with those at a later point.
+#
+
+- name: Setup Codium Package
+  tags:
+    - codium
+  when: "'codium' not in ansible_facts['packages'].keys()"
+  block:
+    - name: Ensure keyring directory exists
+      ansible.builtin.file:
+        mode: "0755"
+        state: directory
+        owner: "{{ su_user }}"
+        group: "{{ su_group }}"
+        path: "{{ apt.keyring }}"
+
+    - name: Install Codium keyring
+      vars:
+        project: vscodium-deb-rpm-repo
+        owner: paulcarroty
+        dest_file: codium.asc
+      ansible.builtin.get_url:
+        mode: "0644"
+        owner: "{{ su_user }}"
+        group: "{{ su_group }}"
+        url: >-
+          https://gitlab.com/{{ owner }}/{{ project }}/raw/master/pub.gpg
+        dest: "{{ apt.keyring }}/{{ dest_file }}"
+
+    - name: Set up Codium Source
+      vars:
+        keyring_path: "{{ apt.keyring }}/codium.asc"
+      ansible.builtin.template:
+        src: templates/apt-source.j2
+        dest: "{{ apt.sources }}/codium.list"
+        owner: "{{ su_user }}"
+        group: "{{ su_group }}"
+        mode: "0644"
+
+    - name: Install Codium
+      ansible.builtin.apt:
+        clean: true
+        update_cache: true
+        install_recommends: false
+        name:
+          - codium
+
+    - name: Refresh package list post installation
+      ansible.builtin.package_facts:
+        manager:
+          - apt
+      register: packages
+
+# - name: test
+#   debugger: 'always'
+#   tags: [codium]
+#   ansible.builtin.command:
+#     cmd: echo 'hello world'
+
+
+- name: Manage Codium extensions
+  when: "'codium' in ansible_facts['packages'].keys()"
+  become: true
+  become_user: "{{ system_user }}"
+  tags:
+    - codium
+  block:
+    - name: Get installed Codium extensions
+      ansible.builtin.command:
+        cmd: codium --list-extensions
+      changed_when: true
+      register: extensions
+
+    - name: Install required Codium extensions
+      vars:
+        codium_extensions:
+          - eamodio.gitlens
+          - exiasr.hadolint
+          - helm-ls.helm-ls
+          - kevinrose.vsc-python-indent
+          - kylinideteam.cmake-intellisence
+          - marus25.cortex-debug
+          - mcu-debug.debug-tracker-vscode
+          - mcu-debug.memory-view
+          - mcu-debug.peripheral-viewer
+          - mcu-debug.rtos-views
+          - ms-azuretools.vscode-containers
+          - ms-azuretools.vscode-docker
+          - ms-kubernetes-tools.vscode-kubernetes-tools
+          - ms-python.debugpy
+          - ms-python.flake8
+          - ms-python.pylint
+          - ms-python.python
+          - paulober.pico-w-go
+          - raspberry-pi.raspberry-pi-pico
+          - redhat.ansible
+          - redhat.vscode-yaml
+          - shardulm94.trailing-spaces
+          - streetsidesoftware.code-spell-checker
+          - teabyii.ayu
+          - timonwong.shellcheck
+          - twxs.cmake
+      ansible.builtin.command:
+        cmd: codium --install-extension {{ item }}
+      with_items: "{{ codium_extensions | difference(extensions['stdout_lines']) }}"
+      register: install
+      changed_when: install.rc == 0
+
+
+- name: Manage Codium user preferences
+  become_user: "{{ su_user }}"
+  become: true
+  when: "'codium' in ansible_facts['packages'].keys()"
+  tags:
+    - codium
+  block:
+    - name: Ensure config directory tree is present
+      ansible.builtin.file:
+        state: directory
+        owner: "{{ system_user }}"
+        group: "{{ system_user }}"
+        path: "/home/{{ system_user }}/.config/VSCodium/User"
+        recurse: true
+
+    - name: Set up keybindings
+      ansible.builtin.copy:
+        src: templates/keybindings.json
+        dest: "/home/{{ system_user }}/.config/VSCodium/User/keybindings.json"
+        owner: "{{ system_user }}"
+        group: "{{ system_user }}"
+        mode: "0644"
+
+    # FIXME
+    #
+    # There is scope for this to be more robust by using templating, i.e.,
+    # only adding extension relevant configuration when we've verified said
+    # extension is already installed.
+    #
+    # ref: https://docs.ansible.com/ansible/latest/collections/ansible/builtin/lineinfile_module.html
+    #
+
+    - name: Get installed Codium extensions
+      become: true
+      become_user: "{{ system_user }}"
+      ansible.builtin.command:
+        cmd: codium --list-extensions
+      changed_when: true
+      register: extensions
+
+    - name: Set up user settings
+      ansible.builtin.copy:
+        src: templates/settings.json
+        dest: "/home/{{ system_user }}/.config/VSCodium/User/settings.json"
+        owner: "{{ system_user }}"
+        group: "{{ system_user }}"
+        mode: "0644"

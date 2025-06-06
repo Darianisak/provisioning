@@ -1,18 +1,24 @@
 {
-    "workbench.colorCustomizations": {
-
-    },
+    "workbench.colorCustomizations": {},
     "workbench.colorTheme": "Ayu Light Bordered",
     "workbench.iconTheme": "ayu",
+    "workbench.sideBar.location": "right",
+    "terminal.integrated.defaultProfile.linux": "bash",
+    "editor.minimap.enabled": false,
+
+
     "redhat.telemetry.enabled": false,
+
+
     "files.associations": {
         "*.yml": "yaml"
     },
+
+
     "yaml.customTags": [
         "!reference sequence"
     ],
     "[yaml]": {
-
         "editor.insertSpaces": true,
         "editor.tabSize": 2,
         "editor.autoIndent": "keep",
@@ -23,11 +29,14 @@
             "strings": true
         }
     },
-    "workbench.sideBar.location": "right",
-    "terminal.integrated.defaultProfile.linux": "bash",
-    "editor.minimap.enabled": false,
     "[python]": {
         "diffEditor.ignoreTrimWhitespace": false
     },
-    "gitlens.ai.experimental.generateCommitMessage.enabled": false
+
+
+    "gitlens.ai.experimental.generateCommitMessage.enabled": false,
+    "ansible.lightspeed.suggestions.enabled": false,
+    "ansible.lightspeed.enabled": false,
+    "raspberry-pi-pico.python3Path": "/bin/python3"
+
 }
