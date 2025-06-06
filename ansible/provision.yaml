@@ -82,37 +82,6 @@
           - libgdk-pixbuf2.0-0 # For minecraft
       tags: ['always', 'apt', 'install']
 
-    - name: Install nVidia prerequisite drivers
-      become: true
-      ansible.builtin.apt:
-        clean: true
-        update_cache: true
-        install_recommends: false
-        name:
-          - linux-headers-amd64
-      tags: ['nvidia', 'apt', 'steam']
-
-    # FIXME - can result in duplicate apt source warnings
-    - name: Replace apt sources.list for nVidia drivers
-      ansible.builtin.template:
-        src: templates/sources.j2
-        dest: /etc/apt/sources.list
-        owner: root
-        group: root
-        mode: "0644"
-      tags: ['source', 'apt', 'nvidia', 'steam']
-
-    - name: Install nVidia drivers
-      become: true
-      ansible.builtin.apt:
-        clean: true
-        update_cache: true
-        install_recommends: true  # Just install defaults - risky install.
-        name:
-          - nvidia-driver=535.183.01-1~deb12u1  # Would be nice to pin releases.
-          - nvidia-driver-libs:i386=535.183.01-1~deb12u1
-      tags: ['nvidia', 'apt', 'steam']
-
     - name: Install Vulkan/32-bit dependencies
       become: true
       ansible.builtin.apt:
@@ -182,4 +151,5 @@
     - docker
     - spotify
     - codium
+    - nvidia
     - keys
