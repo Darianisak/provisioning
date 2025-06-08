@@ -14,4 +14,3 @@ playbook: ansible/provision.yaml
       keys : Deploy Public	TAGS: [keys]
       keys : Deploy Private	TAGS: [keys]
       Install packages from default repositories	TAGS: [always, apt, install]
-      Create keyrings directory	TAGS: [always, apt, keyring]
