@@ -60,8 +60,8 @@
         mode: "0644"
 
 
-# FIXME : There's an undeclared dependency here on the apt
-#         source being setup.
+# FIXME : There's an undeclared dependency here on the apt source.
+#
 - name: Set up i386 nVidia drivers
   become: true
   become_user: "{{ su_user }}"
@@ -72,21 +72,13 @@
     - nvidia
   when: "i386_packages is not subset(ansible_facts['packages'].keys())"
   block:
-    - name: Get current architectures
-      ansible.builtin.command:
-        cmd: dpkg --print-foreign-architectures
-      changed_when: false  # idempotent
-      register: arch
-
-    - name: Add i386 as a valid architecture
-      ansible.builtin.command:
-        cmd: dpkg --add-architecture i386
-      changed_when: "result._result.rc == 0"
-      when: "'i386' not in arch.stdout_lines"
+    - name: Ensure i386 packages can be installed
+      ansible.builtin.include_role:
+        name: dpkg
 
     # We don't refresh `ansible_facts['packages']` as subsequent jobs don't
-    # depend on that state.
-    - name: Install i386 packages
+    # depend on this state.
+    - name: Install nvidia i386 packages
       ansible.builtin.apt:
         update_cache: true
         name:
