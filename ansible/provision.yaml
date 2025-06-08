@@ -34,23 +34,6 @@
     # https://docs.ansible.com/ansible/latest/collections/ansible \
     # /builtin/user_module.html
 
-    - name: Check configured dpkg architectures
-      become: true
-      ansible.builtin.command:
-        cmd: dpkg --print-foreign-architectures
-      register: configured_architectures
-      changed_when: configured_architectures.rc == 0
-      tags: ['always', 'apt']
-
-    - name: Configure i386 as a valid architecture
-      become: true
-      ansible.builtin.command:
-        cmd: dpkg --add-architecture i386
-      register: dpkg_architectures
-      when: "'i386' not in configured_architectures.stdout_lines"
-      changed_when: dpkg_architectures.rc == 0
-      tags: ['always', 'apt']
-
     - name: Update apt-cache
       ansible.builtin.apt:
         clean: true
@@ -81,30 +64,6 @@
           - default-jre # For minecraft
           - libgdk-pixbuf2.0-0 # For minecraft
       tags: ['always', 'apt', 'install']
-
-    - name: Install Vulkan/32-bit dependencies
-      become: true
-      ansible.builtin.apt:
-        clean: true
-        update_cache: true
-        install_recommends: false
-        name:
-          - mesa-vulkan-drivers
-          - libglx-mesa0:i386
-          - mesa-vulkan-drivers:i386
-          - libgl1-mesa-dri:i386
-          - libgl1-mesa-glx:i386
-      tags: ['apt', 'steam', 'vulkan']
-
-    - name: Install Steam
-      become: true
-      ansible.builtin.apt:
-        clean: true
-        update_cache: true
-        install_recommends: false
-        name:
-          - steam-installer
-      tags: ['apt', 'steam']
 
     - name: Check if using gnome
       ansible.builtin.command:
@@ -152,4 +111,5 @@
     - spotify
     - codium
     - nvidia
+    - steam
     - keys

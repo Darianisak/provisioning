@@ -1,0 +1,23 @@
+---
+
+# This task is designed to be called via `ansible.builtin.include_role`.
+#
+# Parent task tags wouldn't be inherited here, so we apply an 'always' to
+# ensure that jobs including this task will run it, not just include it.
+#
+- name: Ensure i386 is a valid architecture
+  tags:
+    - always
+  block:
+    - name: Get current architectures
+      ansible.builtin.command:
+        cmd: dpkg --print-foreign-architectures
+      changed_when: false  # idempotent
+      register: arch
+
+    - name: Add i386 as a valid architecture
+      ansible.builtin.command:
+        cmd: dpkg --add-architecture i386
+      register: result
+      changed_when: "result.rc == 0"
+      when: "'i386' not in arch.stdout_lines"

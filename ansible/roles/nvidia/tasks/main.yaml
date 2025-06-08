@@ -8,106 +8,32 @@
   tags:
     - nvidia
 
-- name: Replace default debian sources
+
+- name: Set up NVIDIA packages
   become: true
   become_user: "{{ su_user }}"
   vars:
-    nvidia_packages:  # FIXME : There's some var duplication here.
+    nvidia_packages:
       - nvidia-driver-libs:i386
       - linux-headers-amd64
       - nvidia-driver
-    managed_path: "/etc/apt/sources.list"
   tags:
     - nvidia
   when: "nvidia_packages is not subset(ansible_facts['packages'].keys())"
-  # FIXME: This is NOT idempotent. As we're finding ANY file that contains
-  # a deb src line, we can/could rewrite Ansible deployed sources in cases
-  # whereby the NVIDIA packages are not present.
-  #
-  # We should write managed deb sources to a predefined path and ONLY run this
-  # block if that file is missing. But, NVIDIA is the only role where we need
-  # to do this with the debian sources, so... eh. Do it later.
-  #
   block:
-    # This can vary between images and 'real' installs, so...
-    #   a) Find wherever the debian sources file is
-    #   b) Delete it
-    #   c) Populate a managed one.
-    # We remove this so we avoid duplicate source warnings.
-    #
-    - name: Find debian source file
-      ansible.builtin.find:
-        paths:
-          - /etc/apt/
-        contains: "deb.debian.org"
-        read_whole_file: true
-        recurse: true
-      register: deb_source
-      failed_when: "deb_source['files'] | length == 0"
+    - name: Ensure managed apt sources are deployed
+      ansible.builtin.include_role:
+        name: apt
 
-    - name: Remove pre-generated sources
-      ansible.builtin.file:
-        path: "{{ item['path'] }}"
-        state: absent
-      with_items: "{{ deb_source['files'] }}"
-
-    - name: Deploy managed sources file
-      ansible.builtin.template:
-        src: templates/sources.j2
-        dest: /etc/apt/sources.list
-        owner: root
-        group: root
-        mode: "0644"
-
-
-# FIXME : There's an undeclared dependency here on the apt
-#         source being setup.
-- name: Set up i386 nVidia drivers
-  become: true
-  become_user: "{{ su_user }}"
-  vars:
-    i386_packages:
-      - nvidia-driver-libs:i386
-  tags:
-    - nvidia
-  when: "i386_packages is not subset(ansible_facts['packages'].keys())"
-  block:
-    - name: Get current architectures
-      ansible.builtin.command:
-        cmd: dpkg --print-foreign-architectures
-      changed_when: false  # idempotent
-      register: arch
-
-    - name: Add i386 as a valid architecture
-      ansible.builtin.command:
-        cmd: dpkg --add-architecture i386
-      changed_when: "result._result.rc == 0"
-      when: "'i386' not in arch.stdout_lines"
+    - name: Ensure i386 packages can be installed
+      ansible.builtin.include_role:
+        name: dpkg
 
     # We don't refresh `ansible_facts['packages']` as subsequent jobs don't
-    # depend on that state.
-    - name: Install i386 packages
+    # depend on this state.
+    - name: Install nvidia packages
       ansible.builtin.apt:
         update_cache: true
         name:
           - "{{ item }}"
-      with_items: "{{ i386_packages | difference(packages['ansible_facts']['packages'].keys()) }}"
-
-
-# FIXME : There's an undeclared dependency here on the apt
-#         source being setup.
-- name: Set up amd64 nVidia drivers
-  become: true
-  become_user: "{{ su_user }}"
-  vars:
-    amd64_packages:
-      - linux-headers-amd64
-      - nvidia-driver
-  tags:
-    - nvidia
-  when: "amd64_packages is not subset(ansible_facts['packages'].keys())"
-  ansible.builtin.apt:
-    update_cache: true
-    name:
-      - "{{ item }}"
-  with_items: "{{ amd64_packages | difference(packages['ansible_facts']['packages'].keys()) }}"
+      with_items: "{{ nvidia_packages | difference(packages['ansible_facts']['packages'].keys()) }}"

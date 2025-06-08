@@ -7,8 +7,6 @@ playbook: ansible/provision.yaml
     tasks:
       Check if 'os_family' is supported	TAGS: [always, os_family]
       Check system_user exists	TAGS: [always, user]
-      Check configured dpkg architectures	TAGS: [always, apt]
-      Configure i386 as a valid architecture	TAGS: [always, apt]
       Update apt-cache	TAGS: [always, apt, cache]
       docker : Check for installed Docker packages	TAGS: [docker]
       docker : Ensure keyring directory exists	TAGS: [docker]
@@ -20,4 +18,3 @@ playbook: ansible/provision.yaml
       docker : Get user's current groups	TAGS: [docker]
       docker : Add user to Docker group, if required	TAGS: [docker]
       Install packages from default repositories	TAGS: [always, apt, install]
-      Create keyrings directory	TAGS: [always, apt, keyring]

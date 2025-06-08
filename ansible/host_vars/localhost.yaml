@@ -2,6 +2,7 @@
 apt:
   keyring: "/etc/apt/keyrings"
   sources: "/etc/apt/sources.list.d"
+  managed: "/etc/apt/sources.list.d/debian.list"
 
 su_user: root
 su_group: root
