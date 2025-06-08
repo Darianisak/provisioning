@@ -7,8 +7,6 @@ playbook: ansible/provision.yaml
     tasks:
       Check if 'os_family' is supported	TAGS: [always, os_family]
       Check system_user exists	TAGS: [always, user]
-      Check configured dpkg architectures	TAGS: [always, apt]
-      Configure i386 as a valid architecture	TAGS: [always, apt]
       Update apt-cache	TAGS: [always, apt, cache]
       codium : Check for installed Codium	TAGS: [codium]
       codium : Ensure keyring directory exists	TAGS: [codium]
@@ -23,4 +21,3 @@ playbook: ansible/provision.yaml
       codium : Get installed Codium extensions	TAGS: [codium]
       codium : Set up user settings	TAGS: [codium]
       Install packages from default repositories	TAGS: [always, apt, install]
-      Create keyrings directory	TAGS: [always, apt, keyring]

@@ -7,8 +7,6 @@ playbook: ansible/provision.yaml
     tasks:
       Check if 'os_family' is supported	TAGS: [always, os_family]
       Check system_user exists	TAGS: [always, user]
-      Check configured dpkg architectures	TAGS: [always, apt]
-      Configure i386 as a valid architecture	TAGS: [always, apt]
       Update apt-cache	TAGS: [always, apt, cache]
       Install packages from default repositories	TAGS: [always, apt, install]
       Define username	TAGS: [git]
