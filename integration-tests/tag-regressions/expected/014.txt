@@ -11,6 +11,5 @@ playbook: ansible/provision.yaml
       Configure i386 as a valid architecture	TAGS: [always, apt]
       Update apt-cache	TAGS: [always, apt, cache]
       Install packages from default repositories	TAGS: [always, apt, install]
-      Create keyrings directory	TAGS: [always, apt, keyring]
       Define username	TAGS: [git]
       Define email	TAGS: [git]
