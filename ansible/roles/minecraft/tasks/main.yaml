@@ -1,0 +1,50 @@
+---
+
+- name: Check for installed packages
+  ansible.builtin.package_facts:
+    manager:
+      - apt
+  register: packages
+  tags:
+    - minecraft
+
+
+- name: Install Minecraft dependencies
+  vars:
+    minecraft_dependencies:
+      - default-jre
+      - libgdk-pixbuf2.0-0
+  tags:
+    - minecraft
+  ansible.builtin.apt:
+    update_cache: true
+    name:
+      - "{{ item }}"
+  with_items: "{{ minecraft_dependencies | difference(packages['ansible_facts']['packages'].keys()) }}"
+
+
+- name: Install the Minecraft launcher
+  tags:
+    - minecraft
+  vars:
+    temp_path: "/tmp/Minecraft.deb"
+  when: "'minecraft-launcher' not in ansible_facts['packages'].keys()"
+  block:
+    - name: Download Minecraft .deb
+      ansible.builtin.get_url:
+        url: https://launcher.mojang.com/download/Minecraft.deb
+        mode: "0644"
+        owner: "{{ system_user }}"
+        group: "{{ system_user }}"
+        dest: "{{ temp_path }}"
+
+    - name: Install Minecraft .deb
+      become: true
+      become_user: "{{ su_user }}"
+      ansible.builtin.apt:
+        deb: "{{ temp_path }}"
+
+    - name: Remove Minecraft installation .deb
+      ansible.builtin.file:
+        state: absent
+        path: "{{ temp_path }}"

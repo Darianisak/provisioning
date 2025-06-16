@@ -1,0 +1,16 @@
+Test 017 - # Check configuration order for Minecraft.
+
+
+playbook: ansible/provision.yaml
+
+  play #1 (localhost): Provision system	TAGS: []
+    tasks:
+      Check if 'os_family' is supported	TAGS: [always, os_family]
+      Check system_user exists	TAGS: [always, user]
+      Update apt-cache	TAGS: [always, apt, cache]
+      minecraft : Check for installed packages	TAGS: [minecraft]
+      minecraft : Install Minecraft dependencies	TAGS: [minecraft]
+      minecraft : Download Minecraft .deb	TAGS: [minecraft]
+      minecraft : Install Minecraft .deb	TAGS: [minecraft]
+      minecraft : Remove Minecraft installation .deb	TAGS: [minecraft]
+      Install packages from default repositories	TAGS: [always, apt, install]
