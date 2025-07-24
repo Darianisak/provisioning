@@ -1,0 +1,119 @@
+---
+
+# FIXME - There is definitely redundant code in this playbook.
+#
+
+- name: Check whether core node.js packages are present
+  become: true
+  become_user: "{{ system_user }}"
+  tags:
+    - node
+  block:
+    - name: Check whether NVM bootstrap file is present
+      ansible.builtin.file:
+        state: file
+        path: ~/.nvm/nvm.sh
+      failed_when: false
+      register: nvm_load
+
+    - name: Check for a 'complete' NVM installation
+      ansible.builtin.shell:
+        executable: "/bin/bash"
+        cmd: >-
+          source ~/.nvm/nvm.sh
+          && nvm --version
+      failed_when: false
+      changed_when: false
+      register: nvm_state
+      when: not nvm_load.failed
+
+    - name: Check for node installation
+      ansible.builtin.shell:
+        executable: "/bin/bash"
+        cmd: >-
+          source ~/.nvm/nvm.sh
+          && node -v
+      failed_when: false
+      changed_when: false
+      register: node_state
+      when: not nvm_load.failed
+
+    - name: Check for NPM installation
+      ansible.builtin.shell:
+        executable: "/bin/bash"
+        cmd: >-
+          source ~/.nvm/nvm.sh
+          && npm -v
+      failed_when: false
+      changed_when: false
+      register: npm_state
+      when: not nvm_load.failed
+
+
+- name: Install NVM
+  become: true
+  become_user: "{{ system_user }}"
+  tags:
+    - node
+  when: nvm_state.rc != 0 or nvm_load.failed
+  block:
+    - name: Download NVM installation script
+      ansible.builtin.get_url:
+        mode: "0755"
+        owner: "{{ system_user }}"
+        group: "{{ system_user }}"
+        url: >-
+          https://raw.githubusercontent.com/nvm-sh/nvm/v{{ node.nvm_version }}/install.sh
+        dest: "{{ node.install_path }}"
+
+    - name: Run NVM installation
+      ansible.builtin.command:
+        cmd: "{{ node.install_path }}"
+      register: nvm_install
+      failed_when: nvm_install.rc != 0
+      changed_when: nvm_install.rc == 0
+
+    - name: Remove NVM installation script
+      ansible.builtin.file:
+        state: absent
+        path: "{{ node.install_path }}"
+
+
+# Done outside the `block` because `nvm_state` will get registered with
+# skip state, for some reason.
+#
+- name: Verify NVM installation succeeded
+  become: true
+  become_user: "{{ system_user }}"
+  ansible.builtin.shell:
+    # Use bash to ensure `source`.
+    #
+    executable: "/bin/bash"
+    # Note: When wanting to invoke nvm, you will *always* need to source
+    # the nvm.sh file first.
+    #
+    cmd: >-
+      source ~/.nvm/nvm.sh
+      && nvm --version
+  failed_when: nvm_state.rc != 0
+  changed_when: false
+  register: nvm_state  # re register this to update state
+  tags:
+    - node
+
+
+- name: Install NPM/Node.js
+  tags:
+    - node
+  become: true
+  become_user: "{{ system_user }}"
+  ansible.builtin.shell:
+    executable: "/bin/bash"
+    cmd: >-
+      source ~/.nvm/nvm.sh
+      && nvm install {{ node.node_version }}
+  changed_when: true
+  when:
+    - nvm_state.rc == 0
+    - node_state.rc != 0
+    - npm_state.rc != 0
