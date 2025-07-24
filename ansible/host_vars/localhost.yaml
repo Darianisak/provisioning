@@ -12,3 +12,9 @@ system_user: darianculver
 keys:
   private: true
   public: true
+
+node:
+  node_version: 22
+  nvm_version: "0.40.3"
+  install_path: /tmp/nvm.sh
+
