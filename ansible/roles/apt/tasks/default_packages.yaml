@@ -1,0 +1,31 @@
+---
+# Upgrade system packages
+#
+- name: Upgrade default packages
+  ansible.builtin.apt:
+    update_cache: true
+    upgrade: "safe"
+  tags:
+    - apt
+
+
+# Install all system packages that come from the default apt sources, as
+# defined within this systems host_vars file.
+#
+- name: Check for installed packages
+  ansible.builtin.package_facts:
+    manager:
+      - apt
+  register: packages
+  tags:
+    - apt
+
+
+- name: Install Default Apt source packages where required
+  tags:
+    - apt
+  ansible.builtin.apt:
+    update_cache: true
+    name:
+      - "{{ item }}"
+  with_items: "{{ apt.default_packages | difference(packages['ansible_facts']['packages'].keys()) }}"

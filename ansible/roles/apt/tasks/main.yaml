@@ -1,47 +1,24 @@
 ---
 
-# FIXME : We probably want to diff the template against deployed.
-- name: Check if managed sources are deployed
-  ansible.builtin.stat:
-    path: "{{ apt.managed }}"
-  register: managed_state
+- name: Assert action_type is valid
+  ansible.builtin.assert:
+    that:
+      - "apt_action_type in ('sources', 'packages')"
   tags:
     - always
 
 
-# Apt sources can vary depending on installation method, so...
-#   a) Find wherever the debian sources file is
-#   b) Delete it
-#   c) Populate a managed one.
-# We remove this so we avoid duplicate source warnings.
-#
-- name: Deploy managed debian apt sources
-  become: true
-  become_user: "{{ su_user }}"
+- name: Provision debian apt sources.
+  ansible.builtin.include_tasks:
+    file: debian_sources.yaml
+  when: apt_action_type == 'sources'
   tags:
     - always
-  when: not managed_state['stat']['exists']
-  block:
-    - name: Find pre-generated debian source files
-      ansible.builtin.find:
-        paths:
-          - /etc/apt/
-        contains: "deb.debian.org"
-        read_whole_file: true
-        recurse: true
-      register: deb_source
-      failed_when: "deb_source['files'] | length == 0"
 
-    - name: Remove pre-generated sources
-      ansible.builtin.file:
-        path: "{{ item['path'] }}"
-        state: absent
-      with_items: "{{ deb_source['files'] }}"
 
-    - name: Deploy managed sources file
-      ansible.builtin.template:
-        src: templates/sources.j2
-        dest: "{{ apt.managed }}"
-        owner: root
-        group: root
-        mode: "0644"
+- name: Install host default packages
+  ansible.builtin.include_tasks:
+    file: default_packages.yaml
+  when: apt_action_type == 'packages'
+  tags:
+    - always

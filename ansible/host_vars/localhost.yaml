@@ -3,6 +3,21 @@ apt:
   keyring: "/etc/apt/keyrings"
   sources: "/etc/apt/sources.list.d"
   managed: "/etc/apt/sources.list.d/debian.list"
+  # Denotes packages that we're pulling from the default debian packages lists.
+  #
+  default_packages:
+    - git
+    - vim
+    - ca-certificates
+    - curl
+    - dpkg
+    - sudo  # Required for 'become' to work.
+    - jq
+    - yq
+    - python3-pip
+    - keepassxc  # TODO - Need a solution for pull key dbs.
+    - lutris
+
 
 su_user: root
 su_group: root

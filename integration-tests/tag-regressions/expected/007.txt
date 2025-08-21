@@ -7,7 +7,12 @@ playbook: ansible/provision.yaml
     tasks:
       Check if 'os_family' is supported	TAGS: [always, os_family]
       Check system_user exists	TAGS: [always, user]
-      Update apt-cache	TAGS: [always, apt, cache]
+      apt : Assert action_type is valid	TAGS: [always, apt]
+      apt : Provision debian apt sources.	TAGS: [always, apt]
+      apt : Install host default packages	TAGS: [always, apt]
+      apt : Assert action_type is valid	TAGS: [always, apt]
+      apt : Provision debian apt sources.	TAGS: [always, apt]
+      apt : Install host default packages	TAGS: [always, apt]
       codium : Check for installed Codium	TAGS: [codium]
       codium : Ensure keyring directory exists	TAGS: [codium]
       codium : Install Codium keyring	TAGS: [codium]
@@ -20,4 +25,3 @@ playbook: ansible/provision.yaml
       codium : Set up keybindings	TAGS: [codium]
       codium : Get installed Codium extensions	TAGS: [codium]
       codium : Set up user settings	TAGS: [codium]
-      Install packages from default repositories	TAGS: [always, apt, install]

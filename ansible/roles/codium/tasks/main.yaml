@@ -65,12 +65,6 @@
           - apt
       register: packages
 
-# - name: test
-#   debugger: 'always'
-#   tags: [codium]
-#   ansible.builtin.command:
-#     cmd: echo 'hello world'
-
 
 - name: Manage Codium extensions
   when: "'codium' in ansible_facts['packages'].keys()"
