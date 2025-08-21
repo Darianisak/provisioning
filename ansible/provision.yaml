@@ -89,11 +89,11 @@
       tags: ['apt', 'gnome']
   roles:
     - docker
-    - spotify
     - codium
     - nvidia
     - steam
-    - keys
     - minecraft
     - git
     - node
+    - spotify
+    - keys
