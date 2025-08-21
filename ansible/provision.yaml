@@ -20,6 +20,10 @@
         success_msg: "'{{ ansible_facts.os_family }}' is supported."
       tags: ['always', 'os_family']
 
+    # FIXME - consider this for managing users on init?
+    # https://docs.ansible.com/ansible/latest/collections/ansible \
+    # /builtin/user_module.html
+    #
     - name: Check system_user exists
       ansible.builtin.command:
         cmd: id {{ system_user }}
@@ -28,39 +32,8 @@
       failed_when: user_state.rc != 0
       tags: ['always', 'user']
 
-    # FIXME - consider this for managing users on init?
-    # https://docs.ansible.com/ansible/latest/collections/ansible \
-    # /builtin/user_module.html
-
-    - name: Update apt-cache
-      ansible.builtin.apt:
-        clean: true
-        update_cache: true
-      tags: ['always', 'apt', 'cache']
-
-    - name: Upgrade default packages
-      ansible.builtin.apt:
-        upgrade: "safe"
-      tags: ['apt', 'upgrade']
 
   tasks:
-    - name: Install packages from default repositories
-      ansible.builtin.apt:
-        install_recommends: false
-        update_cache: true
-        name:
-          - git
-          - vim
-          - ca-certificates
-          - curl
-          - dpkg
-          - sudo  # Required for 'become' to work.
-          - jq
-          - yq
-          - python3-pip
-          - keepassxc  # TODO - Need a solution for pull key dbs.
-      tags: ['always', 'apt', 'install']
-
     - name: Check if using gnome
       ansible.builtin.command:
         cmd: apt policy gnome
@@ -88,6 +61,16 @@
       when: gnome_status.stdout_lines[1] | trim != check_string
       tags: ['apt', 'gnome']
   roles:
+    - role: apt
+      tags:
+        - apt
+      vars:
+        apt_action_type: 'sources'
+    - role: apt
+      tags:
+        - apt
+      vars:
+        apt_action_type: 'packages'
     - docker
     - codium
     - nvidia

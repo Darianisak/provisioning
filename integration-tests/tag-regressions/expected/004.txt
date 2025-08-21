@@ -7,7 +7,12 @@ playbook: ansible/provision.yaml
     tasks:
       Check if 'os_family' is supported	TAGS: [always, os_family]
       Check system_user exists	TAGS: [always, user]
-      Update apt-cache	TAGS: [always, apt, cache]
+      apt : Assert action_type is valid	TAGS: [always, apt]
+      apt : Provision debian apt sources.	TAGS: [always, apt]
+      apt : Install host default packages	TAGS: [always, apt]
+      apt : Assert action_type is valid	TAGS: [always, apt]
+      apt : Provision debian apt sources.	TAGS: [always, apt]
+      apt : Install host default packages	TAGS: [always, apt]
       docker : Check for installed Docker packages	TAGS: [docker]
       docker : Ensure keyring directory exists	TAGS: [docker]
       docker : Install Docker keyring	TAGS: [docker]
@@ -17,4 +22,3 @@ playbook: ansible/provision.yaml
       docker : Ensure expected users exists	TAGS: [docker]
       docker : Get user's current groups	TAGS: [docker]
       docker : Add user to Docker group, if required	TAGS: [docker]
-      Install packages from default repositories	TAGS: [always, apt, install]

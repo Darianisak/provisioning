@@ -22,6 +22,8 @@
   when: "nvidia_packages is not subset(ansible_facts['packages'].keys())"
   block:
     - name: Ensure managed apt sources are deployed
+      vars:
+        apt_action_type: 'sources'
       ansible.builtin.include_role:
         name: apt
 
