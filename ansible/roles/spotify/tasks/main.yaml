@@ -13,26 +13,30 @@
     - spotify
   when: "'spotify-client' not in packages['ansible_facts']['packages'].keys()"
   block:
-    - name: Ensure keyring directory exists
+    - name: Ensure trusted directory exists
       ansible.builtin.file:
         mode: "0755"
         state: directory
         owner: "{{ su_user }}"
         group: "{{ su_group }}"
-        path: "{{ apt.keyring }}"
+        path: "{{ apt.trusted }}"
 
     - name: Install Spotify keyring
       ansible.builtin.get_url:
         mode: "0644"
         owner: "{{ su_user }}"
         group: "{{ su_group }}"
+        # Note: The Public Key identifier is subject to change, and has
+        # happened at least twice. So... In cases whereby Spotify installations
+        # no longer work, check that the `pubkey_.*` string below matches
+        # the remote, here:
+        #   https://www.spotify.com/de-en/download/linux/
+        #
         url: >-
-          https://download.spotify.com/{{ ansible_facts.os_family | lower }}/pubkey_6224F9941A8AA6D1.gpg
-        dest: "{{ apt.keyring }}/spotify.asc"
+          https://download.spotify.com/{{ ansible_facts.os_family | lower }}/pubkey_C85668DF69375001.gpg
+        dest: "{{ apt.trusted }}/spotify.asc"
 
     - name: Setup Spotify source
-      vars:
-        keyring_path: "{{ apt.keyring }}/spotify.asc"
       ansible.builtin.template:
         src: templates/apt-source.j2
         dest: "{{ apt.sources }}/spotify.list"

@@ -3,6 +3,8 @@ apt:
   keyring: "/etc/apt/keyrings"
   sources: "/etc/apt/sources.list.d"
   managed: "/etc/apt/sources.list.d/debian.list"
+  trusted: "/etc/apt/trusted.gpg.d"
+
   # Denotes packages that we're pulling from the default debian packages lists.
   #
   default_packages:
