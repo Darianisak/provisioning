@@ -1,0 +1,49 @@
+---
+
+- name: Check for installed packages
+  ansible.builtin.package_facts:
+    manager:
+      - apt
+  register: packages
+  tags:
+    - unity
+
+
+- name: Install Unity
+  tags:
+    - unity
+  when: "'unityhub' is not in ansible_facts['packages'].keys()"
+  block:
+    - name: Ensure keyring directory exists
+      ansible.builtin.file:
+        mode: "0755"
+        state: directory
+        owner: "{{ su_user }}"
+        group: "{{ su_group }}"
+        path: "{{ apt.keyring }}"
+
+    - name: Install Unity keyring
+      ansible.builtin.get_url:
+        mode: "0644"
+        owner: "{{ su_user }}"
+        group: "{{ su_group }}"
+        url: https://hub.unity3d.com/linux/keys/public
+        dest: "{{ apt.keyring }}/unity.asc"
+
+    - name: Setup Unity source
+      vars:
+        keyring_path: "{{ apt.keyring }}/unity.asc"
+      ansible.builtin.template:
+        src: templates/apt-source.j2
+        dest: "{{ apt.sources }}/unity.list"
+        owner: "{{ su_user }}"
+        group: "{{ su_group }}"
+        mode: "0644"
+
+    - name: Install Unity
+      ansible.builtin.apt:
+        clean: true
+        update_cache: true
+        install_recommends: false
+        name:
+          - unityhub
