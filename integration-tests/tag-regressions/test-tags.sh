@@ -72,3 +72,5 @@ run_test "015" "--tags gnome" "# Check gnome configuration order."
 run_test "016" "--tags keys" "# Check SSH configuration order."
 
 run_test "017" "--tags minecraft" "# Check configuration order for Minecraft."
+
+run_test "018" "--tags unity" "# Check configuration order for Unity."

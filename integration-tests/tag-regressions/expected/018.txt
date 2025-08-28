@@ -1,0 +1,20 @@
+Test 018 - # Check configuration order for Unity.
+
+
+playbook: ansible/provision.yaml
+
+  play #1 (localhost): Provision system	TAGS: []
+    tasks:
+      Check if 'os_family' is supported	TAGS: [always, os_family]
+      Check system_user exists	TAGS: [always, user]
+      apt : Assert action_type is valid	TAGS: [always, apt]
+      apt : Provision debian apt sources.	TAGS: [always, apt]
+      apt : Install host default packages	TAGS: [always, apt]
+      apt : Assert action_type is valid	TAGS: [always, apt]
+      apt : Provision debian apt sources.	TAGS: [always, apt]
+      apt : Install host default packages	TAGS: [always, apt]
+      unity : Check for installed packages	TAGS: [unity]
+      unity : Ensure keyring directory exists	TAGS: [unity]
+      unity : Install Unity keyring	TAGS: [unity]
+      unity : Setup Unity source	TAGS: [unity]
+      unity : Install Unity	TAGS: [unity]
