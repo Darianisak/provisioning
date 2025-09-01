@@ -17,5 +17,4 @@ playbook: ansible/provision.yaml
       codium : Install required Codium extensions	TAGS: [codium]
       codium : Ensure config directory tree is present	TAGS: [codium]
       codium : Set up keybindings	TAGS: [codium]
-      codium : Get installed Codium extensions	TAGS: [codium]
       codium : Set up user settings	TAGS: [codium]

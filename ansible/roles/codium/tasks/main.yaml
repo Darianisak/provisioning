@@ -144,14 +144,6 @@
     # FIXME - This could be more robust by using the `lineinfile` module.
     #
 
-    - name: Get installed Codium extensions
-      become: true
-      become_user: "{{ system_user }}"
-      ansible.builtin.command:
-        cmd: codium --list-extensions
-      changed_when: true
-      register: extensions
-
     - name: Set up user settings
       ansible.builtin.copy:
         src: templates/settings.json
