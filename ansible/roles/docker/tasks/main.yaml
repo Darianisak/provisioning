@@ -78,7 +78,6 @@
       ansible.builtin.getent:
         database: group
         key: "{{ item }}"
-      register: user_state
       loop:
         - "{{ docker_group }}"
         - "{{ system_user }}"
