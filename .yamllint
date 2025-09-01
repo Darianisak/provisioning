@@ -1,0 +1,16 @@
+---
+extends: default
+
+yaml-files:
+  - '*.yaml'
+  - '*.yml'
+  - '.yamllint'
+
+ignore:
+  - .venv/
+  - Dockerfile
+  - README.md
+  - LICENSE
+  - '*.txt'
+  - '*.sh'
+  - unityhub/
