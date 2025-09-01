@@ -1,0 +1,58 @@
+---
+
+- name: Check for installed packages
+  ansible.builtin.package_facts:
+    manager:
+      - apt
+  register: packages
+  tags:
+    - discord
+
+
+- name: Install Discord dependencies
+  vars:
+    discord_dependencies:
+      - libasound2
+  tags:
+    - discord
+  ansible.builtin.apt:
+    update_cache: true
+    name:
+      - "{{ item }}"
+  with_items: "{{ discord_dependencies | difference(packages['ansible_facts']['packages'].keys()) }}"
+
+
+# While we *do* have a bespoke tool for installing Discord, that's more intended
+# as a lifecycle management device, i.e., for automating updates. Doing the
+# initial install with Ansible's built-ins is more correct.
+#
+- name: Install Discord
+  tags:
+    - discord
+  vars:
+    temp_path: "/tmp/discord.deb"
+  when: "'discord' not in ansible_facts['packages'].keys()"
+  block:
+    - name: Download Discord .deb
+      ansible.builtin.get_url:
+        url: https://discord.com/api/download?platform=linux
+        mode: "0644"
+        owner: "{{ system_user }}"
+        group: "{{ system_user }}"
+        dest: "{{ temp_path }}"
+
+    - name: Install Discord .deb
+      become: true
+      become_user: "{{ su_user }}"
+      ansible.builtin.apt:
+        deb: "{{ temp_path }}"
+
+    - name: Remove Discord installation .deb
+      ansible.builtin.file:
+        state: absent
+        path: "{{ temp_path }}"
+
+
+# TODO - we'll want to install the compiled bin of our installation tool,
+# so we don't need to deal with Python dependencies in system scope.
+#
