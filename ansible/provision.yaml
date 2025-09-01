@@ -5,8 +5,6 @@
   become: true
   become_user: root
   any_errors_fatal: true
-  vars:  # FIXME; should have a pre_task for user provided values.
-    system_user: darianculver  # Change this line as needed.
   debugger: 'on_failed'
 
   pre_tasks:
