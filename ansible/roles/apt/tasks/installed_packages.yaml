@@ -17,4 +17,4 @@
 #
 - name: Save Linux distribution codename
   ansible.builtin.set_fact:
-    apt_distribution: "{{ ansible_facts.os_family | lower }}"
+    apt_distribution: "{{ ansible_facts['os_family'] | lower }}"
