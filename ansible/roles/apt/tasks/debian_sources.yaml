@@ -1,11 +1,10 @@
 ---
+
 # FIXME : We probably want to diff the template against deployed.
 - name: Check if managed sources are deployed
   ansible.builtin.stat:
     path: "{{ apt.managed }}"
   register: managed_state
-  tags:
-    - apt
 
 
 # Apt sources can vary depending on installation method, so...
@@ -17,8 +16,6 @@
 - name: Deploy managed debian apt sources
   become: true
   become_user: "{{ su_user }}"
-  tags:
-    - apt
   when: not managed_state['stat']['exists']
   block:
     - name: Find pre-generated debian source files

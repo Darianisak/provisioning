@@ -1,10 +1,10 @@
 ---
 
-- name: Check for installed packages
-  ansible.builtin.package_facts:
-    manager:
-      - apt
-  register: packages
+- name: Gather installed package lists.
+  vars:
+    apt_action_type: 'installed'
+  ansible.builtin.include_role:
+    name: apt
   tags:
     - nvidia
 
@@ -19,7 +19,7 @@
       - nvidia-driver
   tags:
     - nvidia
-  when: "nvidia_packages is not subset(ansible_facts['packages'].keys())"
+  when: "nvidia_packages is not subset(apt_installed_packages)"
   block:
     - name: Ensure managed apt sources are deployed
       vars:
@@ -31,11 +31,9 @@
       ansible.builtin.include_role:
         name: dpkg
 
-    # We don't refresh `ansible_facts['packages']` as subsequent jobs don't
-    # depend on this state.
     - name: Install nvidia packages
       ansible.builtin.apt:
         update_cache: true
         name:
           - "{{ item }}"
-      with_items: "{{ nvidia_packages | difference(packages['ansible_facts']['packages'].keys()) }}"
+      with_items: "{{ nvidia_packages | difference(apt_installed_packages) }}"

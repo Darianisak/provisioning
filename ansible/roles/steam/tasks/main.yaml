@@ -1,10 +1,10 @@
 ---
 
-- name: Check for installed packages
-  ansible.builtin.package_facts:
-    manager:
-      - apt
-  register: packages
+- name: Gather installed package lists.
+  vars:
+    apt_action_type: 'installed'
+  ansible.builtin.include_role:
+    name: apt
   tags:
     - steam
 
@@ -20,7 +20,7 @@
       - steam-installer
   tags:
     - steam
-  when: "steam_packages is not subset(ansible_facts['packages'].keys())"
+  when: "steam_packages is not subset(apt_installed_packages)"
   block:
     - name: Ensure managed apt sources are deployed
       vars:
@@ -37,4 +37,4 @@
         update_cache: true
         name:
           - "{{ item }}"
-      with_items: "{{ steam_packages | difference(packages['ansible_facts']['packages'].keys()) }}"
+      with_items: "{{ steam_packages | difference(apt_installed_packages) }}"

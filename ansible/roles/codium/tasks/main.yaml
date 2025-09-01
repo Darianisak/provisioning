@@ -1,10 +1,10 @@
 ---
 
-- name: Check for installed Codium
-  ansible.builtin.package_facts:
-    manager:
-      - apt
-  register: packages
+- name: Gather installed package lists.
+  vars:
+    apt_action_type: 'installed'
+  ansible.builtin.include_role:
+    name: apt
   tags:
     - codium
 
@@ -18,7 +18,7 @@
 - name: Setup Codium Package
   tags:
     - codium
-  when: "'codium' not in ansible_facts['packages'].keys()"
+  when: "'codium' not in apt_installed_packages"
   block:
     - name: Ensure keyring directory exists
       ansible.builtin.file:
@@ -59,15 +59,18 @@
         name:
           - codium
 
-    - name: Refresh package list post installation
-      ansible.builtin.package_facts:
-        manager:
-          - apt
-      register: packages
+
+- name: Gather installed package lists.
+  vars:
+    apt_action_type: 'installed'
+  ansible.builtin.include_role:
+    name: apt
+  tags:
+    - codium
 
 
 - name: Manage Codium extensions
-  when: "'codium' in ansible_facts['packages'].keys()"
+  when: "'codium' in apt_installed_packages"
   become: true
   become_user: "{{ system_user }}"
   tags:
@@ -77,11 +80,11 @@
       ansible.builtin.command:
         cmd: codium --list-extensions
       changed_when: true
-      register: extensions
+      register: installed_exts
 
     - name: Install required Codium extensions
       vars:
-        codium_extensions:
+        exts:
           - eamodio.gitlens
           - exiasr.hadolint
           - helm-ls.helm-ls
@@ -110,7 +113,7 @@
           - twxs.cmake
       ansible.builtin.command:
         cmd: codium --install-extension {{ item }}
-      with_items: "{{ codium_extensions | difference(extensions['stdout_lines']) }}"
+      with_items: "{{ exts | difference(installed_exts['stdout_lines']) }}"
       register: install
       changed_when: install.rc == 0
 
@@ -118,7 +121,7 @@
 - name: Manage Codium user preferences
   become_user: "{{ su_user }}"
   become: true
-  when: "'codium' in ansible_facts['packages'].keys()"
+  when: "'codium' in apt_installed_packages"
   tags:
     - codium
   block:
@@ -138,22 +141,8 @@
         group: "{{ system_user }}"
         mode: "0644"
 
-    # FIXME
+    # FIXME - This could be more robust by using the `lineinfile` module.
     #
-    # There is scope for this to be more robust by using templating, i.e.,
-    # only adding extension relevant configuration when we've verified said
-    # extension is already installed.
-    #
-    # ref: https://docs.ansible.com/ansible/latest/collections/ansible/builtin/lineinfile_module.html
-    #
-
-    - name: Get installed Codium extensions
-      become: true
-      become_user: "{{ system_user }}"
-      ansible.builtin.command:
-        cmd: codium --list-extensions
-      changed_when: true
-      register: extensions
 
     - name: Set up user settings
       ansible.builtin.copy:

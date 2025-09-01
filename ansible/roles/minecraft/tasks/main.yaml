@@ -1,17 +1,17 @@
 ---
 
-- name: Check for installed packages
-  ansible.builtin.package_facts:
-    manager:
-      - apt
-  register: packages
+- name: Gather installed package lists.
+  vars:
+    apt_action_type: 'installed'
+  ansible.builtin.include_role:
+    name: apt
   tags:
     - minecraft
 
 
 - name: Install Minecraft dependencies
   vars:
-    minecraft_dependencies:
+    dependencies:
       - default-jre
       - libgdk-pixbuf2.0-0
   tags:
@@ -20,7 +20,7 @@
     update_cache: true
     name:
       - "{{ item }}"
-  with_items: "{{ minecraft_dependencies | difference(packages['ansible_facts']['packages'].keys()) }}"
+  with_items: "{{ dependencies | difference(apt_installed_packages) }}"
 
 
 - name: Install the Minecraft launcher
@@ -28,7 +28,7 @@
     - minecraft
   vars:
     temp_path: "/tmp/Minecraft.deb"
-  when: "'minecraft-launcher' not in ansible_facts['packages'].keys()"
+  when: "'minecraft-launcher' not in apt_installed_packages"
   block:
     - name: Download Minecraft .deb
       ansible.builtin.get_url:

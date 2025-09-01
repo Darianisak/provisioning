@@ -61,16 +61,6 @@
       when: gnome_status.stdout_lines[1] | trim != check_string
       tags: ['apt', 'gnome']
   roles:
-    - role: apt
-      tags:
-        - apt
-      vars:
-        apt_action_type: 'sources'
-    - role: apt
-      tags:
-        - apt
-      vars:
-        apt_action_type: 'packages'
     - docker
     - codium
     - nvidia

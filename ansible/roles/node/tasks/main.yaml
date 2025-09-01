@@ -58,12 +58,13 @@
   when: nvm_state.rc != 0 or nvm_load.failed
   block:
     - name: Download NVM installation script
+      vars:
+        github_domain: https://raw.githubusercontent.com
       ansible.builtin.get_url:
         mode: "0755"
         owner: "{{ system_user }}"
         group: "{{ system_user }}"
-        url: >-
-          https://raw.githubusercontent.com/nvm-sh/nvm/v{{ node.nvm_version }}/install.sh
+        url: "{{ github_domain }}/nvm-sh/nvm/v{{ node.nvm_version }}/install.sh"
         dest: "{{ node.install_path }}"
 
     - name: Run NVM installation

@@ -3,12 +3,11 @@
 # Note: This file contains ansible-lint ignores; this is because this use of
 # git is not applicable to Ansible's git module.
 
-
-- name: Check for installed packages
-  ansible.builtin.package_facts:
-    manager:
-      - apt
-  register: packages
+- name: Gather installed package lists.
+  vars:
+    apt_action_type: 'installed'
+  ansible.builtin.include_role:
+    name: apt
   tags:
     - git
 
@@ -20,7 +19,7 @@
       - git
   tags:
     - git
-  when: "'git' not in ansible_facts['packages'].keys()"
+  when: "'git' not in apt_installed_packages"
 
 
 - name: Ensure config file is present

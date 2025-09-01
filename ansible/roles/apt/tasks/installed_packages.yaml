@@ -1,0 +1,20 @@
+---
+
+- name: Check for installed packages
+  ansible.builtin.package_facts:
+    manager:
+      - apt
+  register: packages
+
+
+- name: Save package list to host variables
+  ansible.builtin.set_fact:
+    apt_installed_packages: "{{ ansible_facts['packages'].keys() }}"
+
+
+# This is a bit incorrect having this here, but this is useful information
+# for installing *some* apt packages, so...
+#
+- name: Save Linux distribution codename
+  ansible.builtin.set_fact:
+    apt_distribution: "{{ ansible_facts.os_family | lower }}"
