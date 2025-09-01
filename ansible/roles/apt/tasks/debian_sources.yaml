@@ -4,7 +4,7 @@
 - name: Check if managed sources are deployed
   ansible.builtin.stat:
     path: "{{ apt.managed }}"
-  register: managed_state
+  register: apt_managed_state
 
 
 # Apt sources can vary depending on installation method, so...
@@ -16,7 +16,7 @@
 - name: Deploy managed debian apt sources
   become: true
   become_user: "{{ su_user }}"
-  when: not managed_state['stat']['exists']
+  when: not apt_managed_state['stat']['exists']
   block:
     - name: Find pre-generated debian source files
       ansible.builtin.find:
@@ -25,14 +25,14 @@
         contains: "deb.debian.org"
         read_whole_file: true
         recurse: true
-      register: deb_source
-      failed_when: "deb_source['files'] | length == 0"
+      register: apt_deb_source
+      failed_when: "apt_deb_source['files'] | length == 0"
 
     - name: Remove pre-generated sources
       ansible.builtin.file:
         path: "{{ item['path'] }}"
         state: absent
-      with_items: "{{ deb_source['files'] }}"
+      with_items: "{{ apt_deb_source['files'] }}"
 
     - name: Deploy managed sources file
       ansible.builtin.template:

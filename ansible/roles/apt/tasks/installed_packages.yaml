@@ -4,7 +4,7 @@
   ansible.builtin.package_facts:
     manager:
       - apt
-  register: packages
+  register: apt_packages
 
 
 - name: Save package list to host variables
