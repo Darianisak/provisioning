@@ -1,9 +1,10 @@
 ---
+
 - name: Provision system
   hosts: localhost
   gather_facts: true
   become: true
-  become_user: root
+  become_user: "{{ su_user }}"
   any_errors_fatal: true
   debugger: 'on_failed'
 
