@@ -3,3 +3,4 @@ integration-tests/tag-regressions/expected/.*.txt
 .venv
 .ansible
 __pycache__/
+unityhub/
