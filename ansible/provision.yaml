@@ -7,20 +7,8 @@
   become_user: "{{ su_user }}"
   any_errors_fatal: true
   debugger: 'on_failed'
-
-  pre_tasks:
-    # FIXME - consider this for managing users on init?
-    # https://docs.ansible.com/ansible/latest/collections/ansible \
-    # /builtin/user_module.html
-    #
-    - name: Check system_user exists
-      ansible.builtin.command:
-        cmd: id {{ system_user }}
-      register: user_state
-      changed_when: user_state.rc
-      failed_when: user_state.rc != 0
-      tags: ['always', 'user']
   roles:
+    - default_tasks
     - docker
     - codium
     - nvidia

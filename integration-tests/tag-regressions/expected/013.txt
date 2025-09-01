@@ -5,8 +5,6 @@ playbook: ansible/provision.yaml
 
   play #1 (localhost): Provision system	TAGS: []
     tasks:
-      Check if 'os_family' is supported	TAGS: [always, os_family]
-      Check system_user exists	TAGS: [always, user]
       Gather installed package lists.	TAGS: [steam]
       Ensure managed apt sources are deployed	TAGS: [steam]
       Ensure i386 packages can be installed	TAGS: [steam]
