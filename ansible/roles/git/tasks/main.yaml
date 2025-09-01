@@ -22,6 +22,8 @@
   when: "'git' not in apt_installed_packages"
 
 
+# TODO - add `system_user` validation.
+#
 - name: Ensure config file is present
   ansible.builtin.file:
     state: touch
@@ -54,53 +56,63 @@
       when: git_editor.rc == 1 or "vim" not in git_editor.stdout_lines
 
 
-- name: Configure git signing
+- name: Check if a signing name is defined.  # noqa: command-instead-of-module
   become: true
   become_user: "{{ system_user }}"
   tags:
     - git
+  ansible.builtin.command:
+    cmd: git config --global user.name
+  register: git_name
+  changed_when: false  # Idempotent
+  failed_when: git_name.rc not in (0, 1)
+
+
+- name: Set a signing username, if required.
+  become: true
+  become_user: "{{ system_user }}"
+  tags:
+    - git
+  when: git_name.rc == 1
   block:
-    # FIXME - this playbook is badly designed.
-    #
-    # If the username/email is already defined, then we shouldn't prompt for a
-    # new one - that's against the scope of this tooling.
-    #
-    - name: Request signing address
+    - name: Prompt user for a signing username.
       ansible.builtin.pause:
-        prompt: "Email address to sign commits with?"
+        prompt: "What name should be used to sign commits?"
         echo: true
-      register: git_email
+      register: git_new_name
 
-    - name: Request signing username
+    - name: Set signing username.  # noqa: command-instead-of-module
+      ansible.builtin.command:
+        cmd: git config --global user.name "{{ git_new_name.user_input }}"
+      changed_when: true  # Could probably be improved.
+
+
+- name: Check if signing email is defined.  # noqa: command-instead-of-module
+  become: true
+  become_user: "{{ system_user }}"
+  tags:
+    - git
+  ansible.builtin.command:
+    cmd: git config --global user.email
+  register: git_email
+  changed_when: false  # Idempotent
+  failed_when: git_email.rc not in (0, 1)
+
+
+- name: Set a signing email, if required.
+  become: true
+  become_user: "{{ system_user }}"
+  tags:
+    - git
+  when: git_email.rc == 1
+  block:
+    - name: Prompt user for a signing email.
       ansible.builtin.pause:
-        prompt: "User name to sign commits with?"
+        prompt: "What email should be used to sign commits?"
         echo: true
-      register: git_username
+      register: git_new_email
 
-    - name: Get current signing username  # noqa: command-instead-of-module
+    - name: Set signing email.  # noqa: command-instead-of-module
       ansible.builtin.command:
-        cmd: git config --global user.name
-      register: git_current_username
-      changed_when: false  # Idempotent
-      failed_when: git_current_username.rc not in (0, 1)
-
-    - name: Get current signing address  # noqa: command-instead-of-module
-      ansible.builtin.command:
-        cmd: git config --global user.email
-      register: git_current_email
-      changed_when: false  # Idempotent
-      failed_when: git_current_email.rc not in (0, 1)
-
-    - name: Set signing username  # noqa: command-instead-of-module
-      ansible.builtin.command:
-        cmd: git config --global user.name "{{ git_username.user_input }}"
-      register: git_changed_username
-      changed_when: git_changed_username.rc == 0  # Idempotent
-      when: "git_username.user_input not in git_current_username.stdout_lines"
-
-    - name: Set signing address  # noqa: command-instead-of-module
-      ansible.builtin.command:
-        cmd: git config --global user.email "{{ git_email.user_input }}"
-      register: git_changed_email
-      changed_when: git_changed_email.rc == 0  # Idempotent
-      when: "git_email.user_input not in git_current_email.stdout_lines"
+        cmd: git config --global user.email "{{ git_new_email.user_input }}"
+      changed_when: true  # Could probably be improved.
