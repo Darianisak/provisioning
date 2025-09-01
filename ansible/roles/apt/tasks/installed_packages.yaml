@@ -4,7 +4,7 @@
   ansible.builtin.package_facts:
     manager:
       - apt
-  register: packages
+  register: apt_packages
 
 
 - name: Save package list to host variables
@@ -17,4 +17,4 @@
 #
 - name: Save Linux distribution codename
   ansible.builtin.set_fact:
-    apt_distribution: "{{ ansible_facts.os_family | lower }}"
+    apt_distribution: "{{ ansible_facts['os_family'] | lower }}"

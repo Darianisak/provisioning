@@ -13,11 +13,11 @@
       ansible.builtin.command:
         cmd: dpkg --print-foreign-architectures
       changed_when: false  # idempotent
-      register: arch
+      register: dpkg_current_arch
 
     - name: Add i386 as a valid architecture
       ansible.builtin.command:
         cmd: dpkg --add-architecture i386
-      register: result
-      changed_when: "result.rc == 0"
-      when: "'i386' not in arch.stdout_lines"
+      register: dpkg_added_arch
+      changed_when: "dpkg_added_arch.rc == 0"
+      when: "'i386' not in dpkg_current_arch.stdout_lines"

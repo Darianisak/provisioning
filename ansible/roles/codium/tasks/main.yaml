@@ -79,12 +79,16 @@
     - name: Get installed Codium extensions
       ansible.builtin.command:
         cmd: codium --list-extensions
-      changed_when: true
-      register: installed_exts
+      changed_when: false  # idempotent
+      register: codium_ext_state
+
+    - name: Store installed extensions
+      ansible.builtin.set_fact:
+        codium_inst_exts: "{{ codium_ext_state['stdout_lines'] }}"
 
     - name: Install required Codium extensions
       vars:
-        exts:
+        codium_required_exts:
           - eamodio.gitlens
           - exiasr.hadolint
           - helm-ls.helm-ls
@@ -113,9 +117,9 @@
           - twxs.cmake
       ansible.builtin.command:
         cmd: codium --install-extension {{ item }}
-      with_items: "{{ exts | difference(installed_exts['stdout_lines']) }}"
-      register: install
-      changed_when: install.rc == 0
+      with_items: "{{ codium_required_exts | difference(codium_inst_exts) }}"
+      register: codium_ext_dwn_state
+      changed_when: codium_ext_dwn_state.rc == 0
 
 
 - name: Manage Codium user preferences

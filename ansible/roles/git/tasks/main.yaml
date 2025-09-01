@@ -49,8 +49,8 @@
     - name: Set editor to vim  # noqa: command-instead-of-module
       ansible.builtin.command:
         cmd: git config --global core.editor "vim"
-      register: result
-      changed_when: result.rc == 0
+      register: git_update_editor
+      changed_when: git_update_editor.rc == 0
       when: git_editor.rc == 1 or "vim" not in git_editor.stdout_lines
 
 
@@ -60,6 +60,11 @@
   tags:
     - git
   block:
+    # FIXME - this playbook is badly designed.
+    #
+    # If the username/email is already defined, then we shouldn't prompt for a
+    # new one - that's against the scope of this tooling.
+    #
     - name: Request signing address
       ansible.builtin.pause:
         prompt: "Email address to sign commits with?"
@@ -75,27 +80,27 @@
     - name: Get current signing username  # noqa: command-instead-of-module
       ansible.builtin.command:
         cmd: git config --global user.name
-      register: current_username
+      register: git_current_username
       changed_when: false  # Idempotent
-      failed_when: current_username.rc not in (0, 1)
+      failed_when: git_current_username.rc not in (0, 1)
 
     - name: Get current signing address  # noqa: command-instead-of-module
       ansible.builtin.command:
         cmd: git config --global user.email
-      register: current_email
+      register: git_current_email
       changed_when: false  # Idempotent
-      failed_when: current_email.rc not in (0, 1)
+      failed_when: git_current_email.rc not in (0, 1)
 
     - name: Set signing username  # noqa: command-instead-of-module
       ansible.builtin.command:
         cmd: git config --global user.name "{{ git_username.user_input }}"
-      register: result
-      changed_when: result.rc == 0  # Idempotent
-      when: "git_username.user_input not in current_username.stdout_lines"
+      register: git_changed_username
+      changed_when: git_changed_username.rc == 0  # Idempotent
+      when: "git_username.user_input not in git_current_username.stdout_lines"
 
     - name: Set signing address  # noqa: command-instead-of-module
       ansible.builtin.command:
         cmd: git config --global user.email "{{ git_email.user_input }}"
-      register: result
-      changed_when: result.rc == 0  # Idempotent
-      when: "git_email.user_input not in current_email.stdout_lines"
+      register: git_changed_email
+      changed_when: git_changed_email.rc == 0  # Idempotent
+      when: "git_email.user_input not in git_current_email.stdout_lines"
