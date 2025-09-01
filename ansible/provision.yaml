@@ -8,16 +8,6 @@
   debugger: 'on_failed'
 
   pre_tasks:
-
-    # Note: Ubuntu is not 'natively' supported - largely CI only.
-    - name: Check if 'os_family' is supported
-      ansible.builtin.assert:
-        that:
-          - "{{ ansible_facts.os_family in ('Debian', 'Ubuntu') }}"
-        fail_msg: "Error! '{{ ansible_facts.os_family }}' is not supported!"
-        success_msg: "'{{ ansible_facts.os_family }}' is supported."
-      tags: ['always', 'os_family']
-
     # FIXME - consider this for managing users on init?
     # https://docs.ansible.com/ansible/latest/collections/ansible \
     # /builtin/user_module.html
