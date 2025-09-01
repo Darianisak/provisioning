@@ -14,7 +14,7 @@ playbook: ansible/provision.yaml
       apt : Provision debian apt sources.	TAGS: [always, apt]
       apt : Install host default packages	TAGS: [always, apt]
       spotify : Check Spotify installation state	TAGS: [spotify]
-      spotify : Ensure keyring directory exists	TAGS: [spotify]
+      spotify : Ensure trusted directory exists	TAGS: [spotify]
       spotify : Install Spotify keyring	TAGS: [spotify]
       spotify : Setup Spotify source	TAGS: [spotify]
       spotify : Install Spotify	TAGS: [spotify]
