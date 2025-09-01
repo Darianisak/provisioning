@@ -1,17 +1,18 @@
 ---
 
-- name: Check Spotify installation state
-  ansible.builtin.package_facts:
-    manager:
-      - apt
-  register: packages  # If installed, pretty safe to skip the other stuff.
+- name: Gather installed package lists.
+  vars:
+    apt_action_type: 'installed'
+  ansible.builtin.include_role:
+    name: apt
   tags:
     - spotify
+
 
 - name: Setup Spotify
   tags:
     - spotify
-  when: "'spotify-client' not in packages['ansible_facts']['packages'].keys()"
+  when: "'spotify-client' not in apt_installed_packages"
   block:
     - name: Ensure trusted directory exists
       ansible.builtin.file:

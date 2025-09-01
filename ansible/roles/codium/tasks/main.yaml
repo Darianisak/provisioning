@@ -1,10 +1,10 @@
 ---
 
-- name: Check for installed Codium
-  ansible.builtin.package_facts:
-    manager:
-      - apt
-  register: packages
+- name: Gather installed package lists.
+  vars:
+    apt_action_type: 'installed'
+  ansible.builtin.include_role:
+    name: apt
   tags:
     - codium
 
@@ -18,7 +18,7 @@
 - name: Setup Codium Package
   tags:
     - codium
-  when: "'codium' not in ansible_facts['packages'].keys()"
+  when: "'codium' not in apt_installed_packages"
   block:
     - name: Ensure keyring directory exists
       ansible.builtin.file:
@@ -59,15 +59,18 @@
         name:
           - codium
 
-    - name: Refresh package list post installation
-      ansible.builtin.package_facts:
-        manager:
-          - apt
-      register: packages
+
+- name: Gather installed package lists.
+  vars:
+    apt_action_type: 'installed'
+  ansible.builtin.include_role:
+    name: apt
+  tags:
+    - codium
 
 
 - name: Manage Codium extensions
-  when: "'codium' in ansible_facts['packages'].keys()"
+  when: "'codium' in apt_installed_packages"
   become: true
   become_user: "{{ system_user }}"
   tags:
@@ -118,7 +121,7 @@
 - name: Manage Codium user preferences
   become_user: "{{ su_user }}"
   become: true
-  when: "'codium' in ansible_facts['packages'].keys()"
+  when: "'codium' in apt_installed_packages"
   tags:
     - codium
   block:

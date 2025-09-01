@@ -1,24 +1,37 @@
 ---
 
-- name: Assert action_type is valid
-  ansible.builtin.assert:
-    that:
-      - "apt_action_type in ('sources', 'packages')"
+- name: Include apt functionality
+  when:
+    - apt_action_type in ('sources', 'packages', 'installed')
   tags:
     - always
+    - apt
+  block:
+    - name: Get installed package lists
+      ansible.builtin.include_tasks:
+        file: installed_packages.yaml
+      args:
+        apply:
+          tags:
+            'always'
+      when: apt_action_type == 'installed'
 
 
-- name: Provision debian apt sources.
-  ansible.builtin.include_tasks:
-    file: debian_sources.yaml
-  when: apt_action_type == 'sources'
-  tags:
-    - always
+    - name: Provision debian apt sources.
+      ansible.builtin.include_tasks:
+        file: debian_sources.yaml
+      args:
+        apply:
+          tags:
+            'always'
+      when: apt_action_type == 'sources'
 
 
-- name: Install host default packages
-  ansible.builtin.include_tasks:
-    file: default_packages.yaml
-  when: apt_action_type == 'packages'
-  tags:
-    - always
+    - name: Install host default packages
+      ansible.builtin.include_tasks:
+        file: default_packages.yaml
+      args:
+        apply:
+          tags:
+            'always'
+      when: apt_action_type == 'packages'

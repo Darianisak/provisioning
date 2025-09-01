@@ -1,12 +1,13 @@
 ---
 
-- name: Check for installed Docker packages
-  ansible.builtin.package_facts:
-    manager:
-      - apt
-  register: packages
+- name: Gather installed package lists.
+  vars:
+    apt_action_type: 'installed'
+  ansible.builtin.include_role:
+    name: apt
   tags:
     - docker
+
 
 - name: Set up Docker packages
   vars:
@@ -18,7 +19,7 @@
       - docker-compose-plugin
   tags:
     - docker
-  when: "docker_packages is not subset(ansible_facts['packages'].keys())"
+  when: "docker_packages is not subset(apt_installed_packages)"
   block:
     - name: Ensure keyring directory exists
       ansible.builtin.file:
@@ -54,15 +55,16 @@
         install_recommends: false
         name:
           - "{{ item }}"
-      # FIXME : I feel like this condition could be improved
-      #         wrt the block condition.
-      with_items: "{{ docker_packages | difference(packages['ansible_facts']['packages'].keys()) }}"
+      with_items: "{{ docker_packages | difference(apt_installed_packages) }}"
 
-    - name: Refresh package list post installation
-      ansible.builtin.package_facts:
-        manager:
-          - apt
-      register: packages
+
+- name: Gather installed package lists.
+  vars:
+    apt_action_type: 'installed'
+  ansible.builtin.include_role:
+    name: apt
+  tags:
+    - docker
 
 
 - name: Set up user permissions
@@ -71,7 +73,7 @@
   # This might be flawed logic, but I assume `docker-ce` is the only
   # package that matters wrt permissions.
   #
-  when: "'docker-ce' in ansible_facts['packages'].keys()"
+  when: "'docker-ce' in apt_installed_packages"
   block:
     - name: Ensure expected users exists
       ansible.builtin.getent:

@@ -1,10 +1,10 @@
 ---
 
-- name: Check for installed packages
-  ansible.builtin.package_facts:
-    manager:
-      - apt
-  register: packages
+- name: Gather installed package lists.
+  vars:
+    apt_action_type: 'installed'
+  ansible.builtin.include_role:
+    name: apt
   tags:
     - discord
 
@@ -19,7 +19,7 @@
     update_cache: true
     name:
       - "{{ item }}"
-  with_items: "{{ discord_dependencies | difference(packages['ansible_facts']['packages'].keys()) }}"
+  with_items: "{{ discord_dependencies | difference(apt_installed_packages) }}"
 
 
 # While we *do* have a bespoke tool for installing Discord, that's more intended
@@ -31,7 +31,7 @@
     - discord
   vars:
     temp_path: "/tmp/discord.deb"
-  when: "'discord' not in ansible_facts['packages'].keys()"
+  when: "'discord' not in apt_installed_packages"
   block:
     - name: Download Discord .deb
       ansible.builtin.get_url:
