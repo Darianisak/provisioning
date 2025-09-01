@@ -29,35 +29,6 @@
       changed_when: user_state.rc
       failed_when: user_state.rc != 0
       tags: ['always', 'user']
-
-
-  tasks:
-    - name: Check if using gnome
-      ansible.builtin.command:
-        cmd: apt policy gnome
-      register: gnome_status
-      changed_when: gnome_status.rc == 0
-      tags: ['apt', 'gnome']
-
-    - name: Set up Dashboard favorites
-      vars:
-        check_string: "Installed: (none)"  # deal w/inline YAML tag (:).
-      ansible.builtin.command:
-        cmd: >-
-          gsettings set org.gnome.shell favorite-apps
-          "[
-          'org.gnome.Nautilus.desktop',
-          'firefox-esr.desktop',
-          'spotify.desktop',
-          'codium.desktop',
-          'steam.desktop',
-          'org.gnome.Terminal.desktop',
-          'org.keepassxc.KeePassXC.desktop'
-          ]"
-      register: dashboard_favorites
-      changed_when: dashboard_favorites.rc == 0
-      when: gnome_status.stdout_lines[1] | trim != check_string
-      tags: ['apt', 'gnome']
   roles:
     - docker
     - codium
