@@ -1,0 +1,32 @@
+---
+
+# This role defines some high level things that should probably happen in *all*
+# playbook implementations.
+#
+
+- name: Ensure that system user is defined.
+  ansible.builtin.command:
+    cmd: id {{ system_user }}
+  register: default_tasks_user_state
+  changed_when: false
+  failed_when: default_tasks_user_state.rc != 0
+  tags:
+    - defaults
+
+
+- name: Ensure managed apt sources are deployed
+  vars:
+    apt_action_type: 'sources'
+  ansible.builtin.include_role:
+    name: apt
+  tags:
+    - defaults
+
+
+- name: Install default system packages
+  vars:
+    apt_action_type: 'packages'
+  ansible.builtin.include_role:
+    name: apt
+  tags:
+    - defaults

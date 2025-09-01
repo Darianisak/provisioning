@@ -38,6 +38,6 @@
       ansible.builtin.template:
         src: templates/sources.j2
         dest: "{{ apt.managed }}"
-        owner: root
-        group: root
+        owner: "{{ su_user }}"
+        group: "{{ su_group }}"
         mode: "0644"

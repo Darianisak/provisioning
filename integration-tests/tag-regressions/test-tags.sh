@@ -67,10 +67,10 @@ run_test "013" "--tags steam" "# Check configuration order for Steam"
 
 run_test "014" "--tags git" "# Check git configuration order."
 
-run_test "015" "--tags gnome" "# Check gnome configuration order."
-
 run_test "016" "--tags keys" "# Check SSH configuration order."
 
 run_test "017" "--tags minecraft" "# Check configuration order for Minecraft."
 
 run_test "018" "--tags unity" "# Check configuration order for Unity."
+
+run_test "019" "--tags discord" "# Check configuration order for Discord."

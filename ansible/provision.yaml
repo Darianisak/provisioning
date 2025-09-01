@@ -1,66 +1,14 @@
 ---
+
 - name: Provision system
   hosts: localhost
   gather_facts: true
   become: true
-  become_user: root
+  become_user: "{{ su_user }}"
   any_errors_fatal: true
-  vars:  # FIXME; should have a pre_task for user provided values.
-    system_user: darianculver  # Change this line as needed.
   debugger: 'on_failed'
-
-  pre_tasks:
-
-    # Note: Ubuntu is not 'natively' supported - largely CI only.
-    - name: Check if 'os_family' is supported
-      ansible.builtin.assert:
-        that:
-          - "{{ ansible_facts.os_family in ('Debian', 'Ubuntu') }}"
-        fail_msg: "Error! '{{ ansible_facts.os_family }}' is not supported!"
-        success_msg: "'{{ ansible_facts.os_family }}' is supported."
-      tags: ['always', 'os_family']
-
-    # FIXME - consider this for managing users on init?
-    # https://docs.ansible.com/ansible/latest/collections/ansible \
-    # /builtin/user_module.html
-    #
-    - name: Check system_user exists
-      ansible.builtin.command:
-        cmd: id {{ system_user }}
-      register: user_state
-      changed_when: user_state.rc
-      failed_when: user_state.rc != 0
-      tags: ['always', 'user']
-
-
-  tasks:
-    - name: Check if using gnome
-      ansible.builtin.command:
-        cmd: apt policy gnome
-      register: gnome_status
-      changed_when: gnome_status.rc == 0
-      tags: ['apt', 'gnome']
-
-    - name: Set up Dashboard favorites
-      vars:
-        check_string: "Installed: (none)"  # deal w/inline YAML tag (:).
-      ansible.builtin.command:
-        cmd: >-
-          gsettings set org.gnome.shell favorite-apps
-          "[
-          'org.gnome.Nautilus.desktop',
-          'firefox-esr.desktop',
-          'spotify.desktop',
-          'codium.desktop',
-          'steam.desktop',
-          'org.gnome.Terminal.desktop',
-          'org.keepassxc.KeePassXC.desktop'
-          ]"
-      register: dashboard_favorites
-      changed_when: dashboard_favorites.rc == 0
-      when: gnome_status.stdout_lines[1] | trim != check_string
-      tags: ['apt', 'gnome']
   roles:
+    - default_tasks
     - docker
     - codium
     - nvidia

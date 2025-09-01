@@ -5,8 +5,9 @@ playbook: ansible/provision.yaml
 
   play #1 (localhost): Provision system	TAGS: []
     tasks:
-      Check if 'os_family' is supported	TAGS: [always, os_family]
-      Check system_user exists	TAGS: [always, user]
+      default_tasks : Ensure that system user is defined.	TAGS: [defaults]
+      Ensure managed apt sources are deployed	TAGS: [defaults]
+      Install default system packages	TAGS: [defaults]
       Gather installed package lists.	TAGS: [docker]
       docker : Ensure keyring directory exists	TAGS: [docker]
       docker : Install Docker keyring	TAGS: [docker]
@@ -79,5 +80,3 @@ playbook: ansible/provision.yaml
       keys : Ensure ssh directory exists	TAGS: [keys]
       keys : Deploy Public	TAGS: [keys]
       keys : Deploy Private	TAGS: [keys]
-      Check if using gnome	TAGS: [apt, gnome]
-      Set up Dashboard favorites	TAGS: [apt, gnome]
