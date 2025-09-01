@@ -80,11 +80,11 @@
       ansible.builtin.command:
         cmd: codium --list-extensions
       changed_when: true
-      register: extensions
+      register: installed_exts
 
     - name: Install required Codium extensions
       vars:
-        codium_extensions:
+        exts:
           - eamodio.gitlens
           - exiasr.hadolint
           - helm-ls.helm-ls
@@ -113,7 +113,7 @@
           - twxs.cmake
       ansible.builtin.command:
         cmd: codium --install-extension {{ item }}
-      with_items: "{{ codium_extensions | difference(extensions['stdout_lines']) }}"
+      with_items: "{{ exts | difference(installed_exts['stdout_lines']) }}"
       register: install
       changed_when: install.rc == 0
 
@@ -141,13 +141,7 @@
         group: "{{ system_user }}"
         mode: "0644"
 
-    # FIXME
-    #
-    # There is scope for this to be more robust by using templating, i.e.,
-    # only adding extension relevant configuration when we've verified said
-    # extension is already installed.
-    #
-    # ref: https://docs.ansible.com/ansible/latest/collections/ansible/builtin/lineinfile_module.html
+    # FIXME - This could be more robust by using the `lineinfile` module.
     #
 
     - name: Get installed Codium extensions

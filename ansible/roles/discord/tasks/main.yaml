@@ -11,7 +11,7 @@
 
 - name: Install Discord dependencies
   vars:
-    discord_dependencies:
+    dependencies:
       - libasound2
   tags:
     - discord
@@ -19,7 +19,7 @@
     update_cache: true
     name:
       - "{{ item }}"
-  with_items: "{{ discord_dependencies | difference(apt_installed_packages) }}"
+  with_items: "{{ dependencies | difference(apt_installed_packages) }}"
 
 
 # While we *do* have a bespoke tool for installing Discord, that's more intended

@@ -23,18 +23,19 @@
         path: "{{ apt.trusted }}"
 
     - name: Install Spotify keyring
-      ansible.builtin.get_url:
-        mode: "0644"
-        owner: "{{ su_user }}"
-        group: "{{ su_group }}"
+      vars:
         # Note: The Public Key identifier is subject to change, and has
         # happened at least twice. So... In cases whereby Spotify installations
         # no longer work, check that the `pubkey_.*` string below matches
         # the remote, here:
         #   https://www.spotify.com/de-en/download/linux/
         #
-        url: >-
-          https://download.spotify.com/{{ ansible_facts.os_family | lower }}/pubkey_C85668DF69375001.gpg
+        key: pubkey_C85668DF69375001.gpg
+      ansible.builtin.get_url:
+        mode: "0644"
+        owner: "{{ su_user }}"
+        group: "{{ su_group }}"
+        url: https://download.spotify.com/{{ apt_distribution }}/{{ key }}
         dest: "{{ apt.trusted }}/spotify.asc"
 
     - name: Setup Spotify source

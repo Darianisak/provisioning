@@ -11,7 +11,7 @@
 
 - name: Install Minecraft dependencies
   vars:
-    minecraft_dependencies:
+    dependencies:
       - default-jre
       - libgdk-pixbuf2.0-0
   tags:
@@ -20,7 +20,7 @@
     update_cache: true
     name:
       - "{{ item }}"
-  with_items: "{{ minecraft_dependencies | difference(apt_installed_packages) }}"
+  with_items: "{{ dependencies | difference(apt_installed_packages) }}"
 
 
 - name: Install the Minecraft launcher
