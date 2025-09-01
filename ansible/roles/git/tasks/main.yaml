@@ -60,6 +60,11 @@
   tags:
     - git
   block:
+    # FIXME - this playbook is badly designed.
+    #
+    # If the username/email is already defined, then we shouldn't prompt for a
+    # new one - that's against the scope of this tooling.
+    #
     - name: Request signing address
       ansible.builtin.pause:
         prompt: "Email address to sign commits with?"
