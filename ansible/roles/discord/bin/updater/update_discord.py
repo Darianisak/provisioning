@@ -4,6 +4,7 @@ import logging
 from subprocess import Popen, PIPE
 from uuid import uuid1
 from os import remove
+from pathlib import Path
 import requests
 
 DISCORD_LINUX_DOWNLOAD = "https://discord.com/api/download?platform=linux"
@@ -28,7 +29,8 @@ def main():
         logging.info("Installed version is up to date!")
         sys.exit(0)
 
-    f_path = download_latest()
+    f_path = f"/tmp/discord-{uuid1()}"
+    download_latest(f_path)
     install_package(f_path)
 
     delete_install_file(f_path)
@@ -131,7 +133,7 @@ def is_version_newer(version_a: str, version_b: str) -> bool:
     return True
 
 
-def download_latest():
+def download_latest(f_path: str):
     # Partially nabbed from:
     #   https://stackoverflow.com/questions/16694907/download-large-file-in-python-with-requests
     #
@@ -141,10 +143,12 @@ def download_latest():
         "timeout": REQUEST_TIMEOUT,
         "stream": True,
     }
-
     c_size = 4096
 
-    f_path = f"/tmp/discord-{uuid1()}"
+    # FIXME - validate that f_path does not yet exist.
+    #
+
+
     logging.debug("Will write install file to %s", f_path)
 
     with requests.get(**request_args) as req:
@@ -153,12 +157,30 @@ def download_latest():
             for chunk in req.iter_content(chunk_size=c_size):
                 f.write(chunk)
 
+    # A sanity check that things have gone to plan.
+    #
+    _is_file_present(f_path)
+
     logging.info("Installation package installed.")
     return f_path
 
 
 def install_package(f_path: str):
+    _is_file_present(f_path)
+    # FIXME - Need handling for the following:
+    #   dpkg: error: cannot access archive '/tmp/discord-${UUID}': No such file or directory
+    #
     Popen(["sudo", "dpkg", "-i", f_path], stdout=PIPE, encoding="UTF-8")
+
+
+def _is_file_present(f_path: str):
+    install_path = Path(f_path)
+
+    if not install_path.is_file():
+        logging.error("The Discord download at %s could not be found!", f_path)
+        sys.exit(1)
+
+    logging.debug("Discord download at %s was verified.", f_path)
 
 
 def delete_install_file(f_path: str):
