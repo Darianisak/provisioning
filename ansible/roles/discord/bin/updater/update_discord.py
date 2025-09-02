@@ -119,17 +119,13 @@ def is_version_newer(version_a: str, version_b: str) -> bool:
 
     log_message = f"Version A, '{version_a}' is older than B, '{version_b}'"
 
-    if a[0] < b[0]:
-        logging.info(log_message)
-        return False
-
-    if a[1] < b[1]:
-        logging.info(log_message)
-        return False
-
-    if a[2] < b[2]:
-        logging.info(log_message)
-        return False
+    # REFAC - do this with a list comprehension.
+    # FIXME - Cases whereby A is the same as B result in A appearing as older.
+    #
+    for subversion in [0, 1, 2]:
+        if a[subversion] < b[subversion]:
+            logging.info(log_message)
+            return False
 
     logging.info("Version B is newer!")
     return True
