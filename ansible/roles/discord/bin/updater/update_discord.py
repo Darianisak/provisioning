@@ -13,8 +13,10 @@ REQUEST_TIMEOUT = 30
 
 
 def main():
+    # FIXME - Use argparse to support toggling the verbosity.
+    #
     logging.basicConfig(
-        level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+        level=logging.INFO, format="%(levelname)s - %(message)s"
     )
 
     latest_version = get_latest_version_num()
