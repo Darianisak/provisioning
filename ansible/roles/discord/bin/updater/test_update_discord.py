@@ -44,3 +44,21 @@ class TestVersionComparison(unittest.TestCase):
         a = "1.1.35"
         b = "1.1.35"
         self.assertTrue(is_version_newer(a, b))
+
+    def test_no_period_delim(self):
+        a = "1.1.35"
+        b = "1-1-35"
+        with self.assertRaises(SystemExit):
+            is_version_newer(a, b)
+
+    def test_incorrect_version_length_short(self):
+        a = "1.1"
+        b = "1.2.3"
+        with self.assertRaises(SystemExit):
+            is_version_newer(a, b)
+
+    def test_incorrect_version_length_long(self):
+        a = "1.1.1"
+        b = "1.2.3.4"
+        with self.assertRaises(SystemExit):
+            is_version_newer(a, b)

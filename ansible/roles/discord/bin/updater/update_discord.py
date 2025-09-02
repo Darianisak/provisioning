@@ -106,6 +106,13 @@ def is_version_newer(version_a: str, version_b: str) -> bool:
     a = version_a.split(".")
     b = version_b.split(".")
 
+    for version in a, b:
+        if len(version) != 3:
+            logging.error("Unexpected version strings found!")
+            sys.exit(1)
+
+        continue
+
     log_message = f"Version A, '{version_a}' is older than B, '{version_b}'"
 
     if a[0] < b[0]:
