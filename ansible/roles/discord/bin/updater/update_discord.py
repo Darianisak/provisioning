@@ -215,9 +215,6 @@ def download_latest(f_path: str):
     }
     c_size = 4096
 
-    # FIXME - validate that f_path does not yet exist.
-    #
-
     logging.debug("Will write install file to %s", f_path)
 
     try:
