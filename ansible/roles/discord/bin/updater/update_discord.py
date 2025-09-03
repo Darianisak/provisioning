@@ -227,7 +227,7 @@ def download_latest(f_path: str):
     #
     _is_file_present(f_path)
 
-    logging.info("Installation package installed.")
+    logging.info("Installation package downloaded.")
     return f_path
 
 
