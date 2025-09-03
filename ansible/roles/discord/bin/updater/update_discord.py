@@ -3,6 +3,7 @@ import re
 import logging
 import argparse
 from subprocess import Popen, PIPE
+from typing import List
 from uuid import uuid1
 from os import remove
 from pathlib import Path
@@ -10,6 +11,15 @@ import requests
 
 DISCORD_LINUX_DOWNLOAD = "https://discord.com/api/download?platform=linux"
 DISCORD_PKG_NAME = "discord"
+DISCORD_DEPENDENCIES = [
+    "libasound2",
+    "libatomic1",
+    "libnotify4",
+    "libnspr4",
+    "libnss3",
+    "libxss1",
+    "libxtst6",
+]
 REQUEST_TIMEOUT = 30
 
 
@@ -40,6 +50,12 @@ def main():
         else:
             logging.info("Installed version is up to date!")
             sys.exit(0)
+
+    logging.info("Checking that %s dependencies are installed...", DISCORD_PKG_NAME)
+    if not are_dependencies_installed(DISCORD_DEPENDENCIES):
+        logging.fatal("%s dependencies are missing! Please install: %s", DISCORD_PKG_NAME, DISCORD_DEPENDENCIES)
+        sys.exit(1)
+    logging.info("Dependencies are installed!")
 
     logging.info("Beginning installation process...")
 
@@ -118,6 +134,7 @@ def get_installed_version_num(package_name: str):
     version number, which will enable installation.
     """
     version_string = ""
+    version_metadata_key = "Version:"
 
     with Popen(
         ["dpkg", "--status", package_name], stdout=PIPE, encoding="UTF-8"
@@ -127,11 +144,13 @@ def get_installed_version_num(package_name: str):
         if not response:
             return "0.0.0"
 
-        if response[19] != "Version:":
-            logging.fatal("Stdout from dpkg is not in expected format!")
+        if version_metadata_key not in response:
+            logging.fatal("DPKG response does not container version metadata!")
             sys.exit(1)
 
-        version_string = response[20]
+        version_index = response.index(version_metadata_key) + 1
+        version_string = response[version_index]
+
     return version_string
 
 
@@ -159,6 +178,13 @@ def is_remote_version_newer(local: str, remote: str) -> bool:
         return False
 
     return any(int(b[sub_ver]) > int(a[sub_ver]) for sub_ver in [0, 1, 2])
+
+
+def are_dependencies_installed(packages: List[str]):
+    return any(
+        pkg_ver == "0.0.0"
+        for pkg_ver in [get_installed_version_num(package) for package in packages]
+    )
 
 
 def download_latest(f_path: str):
