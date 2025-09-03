@@ -22,17 +22,26 @@ def main():
 
     logging.basicConfig(level=log_level, format="%(levelname)s - %(message)s")
 
-    remote_version = get_latest_version_num()
-    logging.info("Upstream version: %s", remote_version)
-
     installed_version = get_installed_version_num(DISCORD_PKG_NAME)
-    logging.info("Installed version: %s", installed_version)
 
-    if is_remote_version_newer(installed_version, remote_version):
-        logging.info("The installed version is not the most recent!")
+    if installed_version == "0.0.0":
+        # 0.0.0 is a known constant that we control; if it's returned we know
+        # the package is not installed so there's no point in comparing against
+        # remote versions.
+        #
+        logging.info("%s is not installed!", DISCORD_PKG_NAME)
     else:
-        logging.info("Installed version is up to date!")
-        sys.exit(0)
+        logging.info("Installed version: %s", installed_version)
+        remote_version = get_latest_version_num()
+        logging.info("Upstream version: %s", remote_version)
+
+        if is_remote_version_newer(installed_version, remote_version):
+            logging.info("The installed version is not the most recent!")
+        else:
+            logging.info("Installed version is up to date!")
+            sys.exit(0)
+
+    logging.info("Beginning installation process...")
 
     f_path = f"/tmp/discord-{uuid1()}"
     download_latest(f_path)
@@ -116,7 +125,6 @@ def get_installed_version_num(package_name: str):
         response = status.stdout.read().split()
 
         if not response:
-            logging.debug("%s is not installed!", package_name)
             return "0.0.0"
 
         if response[19] != "Version:":
