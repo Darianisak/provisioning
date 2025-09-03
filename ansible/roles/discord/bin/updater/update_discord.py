@@ -22,17 +22,19 @@ def main():
 
     logging.basicConfig(level=log_level, format="%(levelname)s - %(message)s")
 
-    latest_version = get_latest_version_num()
-    logging.info("Upstream version: %s", latest_version)
+    remote_version = get_latest_version_num()
+    logging.info("Upstream version: %s", remote_version)
 
     installed_version = get_installed_version_num()
     logging.info("Installed version: %s", installed_version)
 
-    if is_version_newer(installed_version, latest_version):
+    is_remote_version_newer("0.0.94", "0.0.107")
+
+    if is_remote_version_newer(installed_version, remote_version):
+        logging.info("The installed version is not the most recent!")
+    else:
         logging.info("Installed version is up to date!")
         sys.exit(0)
-    else:
-        logging.info("The installed version is not the most recent!")
 
     f_path = f"/tmp/discord-{uuid1()}"
     download_latest(f_path)
@@ -114,21 +116,20 @@ def get_installed_version_num():
     return version_string
 
 
-def is_version_newer(version_a: str, version_b: str) -> bool:
+def is_remote_version_newer(local: str, remote: str) -> bool:
     # Naive validation, checks that period is used for delimiting.
     #
-    for ver in version_a, version_b:
+    for ver in local, remote:
         if "." not in ver:
             logging.error("Invalid version format found!")
             sys.exit(1)
 
         continue
 
-    # Split the version string into it's constituent integer parts so we
-    # can 'just' do 1-1 comparisons.
+    # We'll split the strings to make comparisons easier.
     #
-    a = version_a.split(".")
-    b = version_b.split(".")
+    a = local.split(".")
+    b = remote.split(".")
 
     for version in a, b:
         if len(version) != 3:
@@ -137,18 +138,12 @@ def is_version_newer(version_a: str, version_b: str) -> bool:
 
         continue
 
-    log_message = f"Version A, '{version_a}' is older than B, '{version_b}'"
+    if a == b:
+        # If local is the same as remote, than we don't need to update.
+        #
+        return False
 
-    # REFAC - do this with a list comprehension.
-    # FIXME - Cases whereby A is the same as B result in A appearing as older.
-    #
-    for subversion in [0, 1, 2]:
-        if a[subversion] < b[subversion]:
-            logging.info(log_message)
-            return False
-
-    logging.info("Version B is newer!")
-    return True
+    return any(int(b[sub_ver]) > int(a[sub_ver]) for sub_ver in [0, 1, 2])
 
 
 def download_latest(f_path: str):
