@@ -25,7 +25,7 @@ def main():
     remote_version = get_latest_version_num()
     logging.info("Upstream version: %s", remote_version)
 
-    installed_version = get_installed_version_num()
+    installed_version = get_installed_version_num(DISCORD_PKG_NAME)
     logging.info("Installed version: %s", installed_version)
 
     if is_remote_version_newer(installed_version, remote_version):
@@ -87,30 +87,29 @@ def get_latest_version_num():
     return latest_version.groups()[0]
 
 
-def get_installed_version_num():
+def get_installed_version_num(package_name: str):
     """
-    Function uses apt to determine if Discord is already installed.
+    Function uses dpkg to determine if Discord is already installed.
 
     In the event that Discord *has not* been installed, we'll return a 0.0.0
     version number, which will enable installation.
     """
-    search_term = r".+Installed:\s([\d\.]+)\s.+"
-    package_name = DISCORD_PKG_NAME
-
     version_string = ""
 
-    # FIXME - We should probably use dpkg instead to avoid apt scripting stderr
-    #   `WARNING: apt does not have a stable CLI interface. Use with caution in scripts.`
-    #
-    with Popen(["apt", "policy", package_name], stdout=PIPE, encoding="UTF-8") as apt:
-        stdout = apt.stdout.read()
+    with Popen(
+        ["dpkg", "--status", package_name], stdout=PIPE, encoding="UTF-8"
+    ) as status:
+        response = status.stdout.read().split()
 
-        if not stdout:
+        if not response:
             logging.debug("%s is not installed!", package_name)
             return "0.0.0"
 
-        version_string = re.search(search_term, stdout).groups()[0]
+        if response[19] != "Version:":
+            logging.fatal("Stdout from dpkg is not in expected format!")
+            sys.exit(1)
 
+        version_string = response[20]
     return version_string
 
 
