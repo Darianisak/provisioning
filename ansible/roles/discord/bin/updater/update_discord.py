@@ -80,7 +80,7 @@ def get_latest_version_num():
         version_string = response.text
 
     if version_string == "":
-        logging.error("Version string was not set!")
+        logging.fatal("Response could not be processed correctly!")
         sys.exit(1)
 
     latest_version = re.search(search_term, version_string)
@@ -117,9 +117,11 @@ def get_installed_version_num():
 def is_remote_version_newer(local: str, remote: str) -> bool:
     # Naive validation, checks that period is used for delimiting.
     #
+    invalid_data_format = "The version strings are not correctly formatted!"
+
     for ver in local, remote:
         if "." not in ver:
-            logging.error("Invalid version format found!")
+            logging.fatal(invalid_data_format)
             sys.exit(1)
 
         continue
@@ -129,12 +131,9 @@ def is_remote_version_newer(local: str, remote: str) -> bool:
     a = local.split(".")
     b = remote.split(".")
 
-    for version in a, b:
-        if len(version) != 3:
-            logging.error("Unexpected version strings found!")
-            sys.exit(1)
-
-        continue
+    if any(len(ver_str) != 3 for ver_str in [a, b]):
+        logging.fatal(invalid_data_format)
+        sys.exit(1)
 
     if a == b:
         # If local is the same as remote, than we don't need to update.
@@ -193,7 +192,7 @@ def _is_file_present(f_path: str):
     install_path = Path(f_path)
 
     if not install_path.is_file():
-        logging.error("The Discord download at %s could not be found!", f_path)
+        logging.fatal("The Discord download at %s could not be found!", f_path)
         sys.exit(1)
 
     logging.debug("Discord download at %s was verified.", f_path)
