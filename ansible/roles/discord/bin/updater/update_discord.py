@@ -74,10 +74,24 @@ def get_latest_version_num():
 
     version_string = ""
 
-    # FIXME - this should have try/catch for http 40X, etc.
-    #
-    with requests.get(**request_args) as response:
-        version_string = response.text
+    try:
+        with requests.get(**request_args) as response:
+            response.raise_for_status()
+            version_string = response.text
+    except requests.ConnectionError:
+        # It would be overkill to implement retry logic for this.
+        #
+        logging.fatal(
+            "Could not establish a connection to %s - try again later.",
+            DISCORD_LINUX_DOWNLOAD,
+        )
+        sys.exit(1)
+
+    except requests.HTTPError as e:
+        logging.fatal(
+            "An HTTPError occurred while checking for install candidates: %s", e
+        )
+        sys.exit(1)
 
     if version_string == "":
         logging.fatal("Response could not be processed correctly!")
@@ -159,11 +173,24 @@ def download_latest(f_path: str):
 
     logging.debug("Will write install file to %s", f_path)
 
-    with requests.get(**request_args) as req:
-        req.raise_for_status()
-        with open(f_path, "wb") as f:
-            for chunk in req.iter_content(chunk_size=c_size):
-                f.write(chunk)
+    try:
+        with requests.get(**request_args) as req:
+            req.raise_for_status()
+            with open(f_path, "wb") as f:
+                for chunk in req.iter_content(chunk_size=c_size):
+                    f.write(chunk)
+    except requests.ConnectionError:
+        # It would be overkill to implement retry logic for this.
+        #
+        logging.fatal(
+            "Could not establish a connection to %s - try again later.",
+            DISCORD_LINUX_DOWNLOAD,
+        )
+        sys.exit(1)
+
+    except requests.HTTPError as e:
+        logging.fatal("An HTTPError occurred during installation: %s", e)
+        sys.exit(1)
 
     # A sanity check that things have gone to plan.
     #
