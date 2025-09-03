@@ -28,8 +28,6 @@ def main():
     installed_version = get_installed_version_num()
     logging.info("Installed version: %s", installed_version)
 
-    is_remote_version_newer("0.0.94", "0.0.107")
-
     if is_remote_version_newer(installed_version, remote_version):
         logging.info("The installed version is not the most recent!")
     else:
