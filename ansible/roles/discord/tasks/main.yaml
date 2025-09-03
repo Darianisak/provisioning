@@ -13,6 +13,12 @@
   vars:
     dependencies:
       - libasound2
+      - libatomic1
+      - libnotify4
+      - libnspr4
+      - libnss3
+      - libxss1
+      - libxtst6
   tags:
     - discord
   ansible.builtin.apt:

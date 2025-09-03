@@ -4,9 +4,7 @@ from update_discord import is_remote_version_newer
 
 # <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">\n<title>Redirecting...</title>\n<h1>Redirecting...</h1>\n<p>You should be redirected automatically to target URL: <a href="https://stable.dl2.discordapp.net/apps/linux/0.0.107/discord-0.0.107.deb">https://stable.dl2.discordapp.net/apps/linux/0.0.107/discord-0.0.107.deb</a>.  If not click the link.
 
-logging.basicConfig(
-    level=logging.FATAL, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logging.disable()
 
 
 class TestVersionComparison(unittest.TestCase):
