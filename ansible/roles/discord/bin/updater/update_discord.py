@@ -39,8 +39,6 @@ def main():
     install_package(f_path, dry_run=args.dry_run)
 
     delete_install_file(f_path)
-
-    logging.info("Package installed.")
     sys.exit(0)
 
 
@@ -101,6 +99,9 @@ def get_installed_version_num():
 
     version_string = ""
 
+    # FIXME - We should probably use dpkg instead to avoid apt scripting stderr
+    #   `WARNING: apt does not have a stable CLI interface. Use with caution in scripts.`
+    #
     with Popen(["apt", "policy", package_name], stdout=PIPE, encoding="UTF-8") as apt:
         stdout = apt.stdout.read()
 
@@ -165,7 +166,6 @@ def download_latest(f_path: str):
     # FIXME - validate that f_path does not yet exist.
     #
 
-
     logging.debug("Will write install file to %s", f_path)
 
     with requests.get(**request_args) as req:
@@ -193,6 +193,7 @@ def install_package(f_path: str, dry_run: bool):
     #   dpkg: error: cannot access archive '/tmp/discord-${UUID}': No such file or directory
     #
     Popen(["sudo", "dpkg", "-i", f_path], stdout=PIPE, encoding="UTF-8")
+    logging.info("Discord has been updated.")
 
 
 def _is_file_present(f_path: str):
