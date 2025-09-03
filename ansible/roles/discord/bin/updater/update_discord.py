@@ -29,10 +29,10 @@ def main():
     logging.info("Installed version: %s", installed_version)
 
     if is_version_newer(installed_version, latest_version):
-        logging.info("The installed version is not the most recent!")
-    else:
         logging.info("Installed version is up to date!")
         sys.exit(0)
+    else:
+        logging.info("The installed version is not the most recent!")
 
     f_path = f"/tmp/discord-{uuid1()}"
     download_latest(f_path)
