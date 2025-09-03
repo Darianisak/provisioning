@@ -1,6 +1,7 @@
 import sys
 import re
 import logging
+import argparse
 from subprocess import Popen, PIPE
 from uuid import uuid1
 from os import remove
@@ -13,11 +14,13 @@ REQUEST_TIMEOUT = 30
 
 
 def main():
-    # FIXME - Use argparse to support toggling the verbosity.
-    #
-    logging.basicConfig(
-        level=logging.INFO, format="%(levelname)s - %(message)s"
-    )
+    args = parse_args()
+
+    log_level = logging.INFO
+    if args.verbose:
+        log_level = logging.DEBUG
+
+    logging.basicConfig(level=log_level, format="%(levelname)s - %(message)s")
 
     latest_version = get_latest_version_num()
     logging.info("Upstream version: %s", latest_version)
@@ -33,12 +36,28 @@ def main():
 
     f_path = f"/tmp/discord-{uuid1()}"
     download_latest(f_path)
-    install_package(f_path)
+    install_package(f_path, dry_run=args.dry_run)
 
     delete_install_file(f_path)
 
     logging.info("Package installed.")
     sys.exit(0)
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        prog="tandem",
+        description="A Discord upgrade client for Linux.",
+        epilog="Authored by <culver.darian@gmail.com>, licensed under GPL v3.",
+    )
+    parser.add_argument(
+        "-v", "--verbose", action="store_true", help="Enables verbose logging."
+    )
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Toggle whether Discord will be updated."
+    )
+
+    return parser.parse_args()
 
 
 def get_latest_version_num():
@@ -163,8 +182,13 @@ def download_latest(f_path: str):
     return f_path
 
 
-def install_package(f_path: str):
+def install_package(f_path: str, dry_run: bool):
     _is_file_present(f_path)
+
+    if dry_run:
+        logging.info("Dry run was requested; will not attempt Discord upgrade.")
+        return
+
     # FIXME - Need handling for the following:
     #   dpkg: error: cannot access archive '/tmp/discord-${UUID}': No such file or directory
     #
