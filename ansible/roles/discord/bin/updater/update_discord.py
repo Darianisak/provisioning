@@ -2,7 +2,7 @@ import sys
 import re
 import logging
 import argparse
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, DEVNULL
 from typing import List
 from uuid import uuid1
 from os import remove
@@ -30,9 +30,13 @@ def main():
     if args.verbose:
         log_level = logging.DEBUG
 
+    dpkg_log = DEVNULL
+    if args.dpkg_verbose:
+        dpkg_log = PIPE
+
     logging.basicConfig(level=log_level, format="%(levelname)s - %(message)s")
 
-    installed_version = get_installed_version_num(DISCORD_PKG_NAME)
+    installed_version = get_installed_version_num(DISCORD_PKG_NAME, log_level=dpkg_log)
 
     if installed_version == "0.0.0":
         # 0.0.0 is a known constant that we control; if it's returned we know
@@ -52,8 +56,12 @@ def main():
             sys.exit(0)
 
     logging.info("Checking that %s dependencies are installed...", DISCORD_PKG_NAME)
-    if not are_dependencies_installed(DISCORD_DEPENDENCIES):
-        logging.fatal("%s dependencies are missing! Please install: %s", DISCORD_PKG_NAME, DISCORD_DEPENDENCIES)
+    if not are_dependencies_installed(DISCORD_DEPENDENCIES, log_level=dpkg_log):
+        logging.fatal(
+            "%s dependencies are missing! Please install: %s",
+            DISCORD_PKG_NAME,
+            DISCORD_DEPENDENCIES,
+        )
         sys.exit(1)
     logging.info("Dependencies are installed!")
 
@@ -61,7 +69,7 @@ def main():
 
     f_path = f"/tmp/discord-{uuid1()}"
     download_latest(f_path)
-    install_package(f_path, dry_run=args.dry_run)
+    install_package(f_path, dry_run=args.dry_run, log_level=dpkg_log)
 
     remove(f_path)
     sys.exit(0)
@@ -75,6 +83,9 @@ def parse_args():
     )
     parser.add_argument(
         "-v", "--verbose", action="store_true", help="Enables verbose logging."
+    )
+    parser.add_argument(
+        "--dpkg-verbose", action="store_true", help="Enables dpkg verbose logging."
     )
     parser.add_argument(
         "--dry-run", action="store_true", help="Toggle whether Discord will be updated."
@@ -126,7 +137,7 @@ def get_latest_version_num():
     return latest_version.groups()[0]
 
 
-def get_installed_version_num(package_name: str):
+def get_installed_version_num(package_name: str, log_level: int):
     """
     Function uses dpkg to determine if Discord is already installed.
 
@@ -137,7 +148,10 @@ def get_installed_version_num(package_name: str):
     version_metadata_key = "Version:"
 
     with Popen(
-        ["dpkg", "--status", package_name], stdout=PIPE, encoding="UTF-8"
+        ["dpkg", "--status", package_name],
+        stdout=PIPE,
+        stderr=log_level,
+        encoding="UTF-8",
     ) as status:
         response = status.stdout.read().split()
 
@@ -180,10 +194,12 @@ def is_remote_version_newer(local: str, remote: str) -> bool:
     return any(int(b[sub_ver]) > int(a[sub_ver]) for sub_ver in [0, 1, 2])
 
 
-def are_dependencies_installed(packages: List[str]):
+def are_dependencies_installed(packages: List[str], log_level: int):
     return any(
         pkg_ver == "0.0.0"
-        for pkg_ver in [get_installed_version_num(package) for package in packages]
+        for pkg_ver in [
+            get_installed_version_num(package, log_level) for package in packages
+        ]
     )
 
 
@@ -231,17 +247,18 @@ def download_latest(f_path: str):
     return f_path
 
 
-def install_package(f_path: str, dry_run: bool):
+def install_package(f_path: str, dry_run: bool, log_level: int):
     _is_file_present(f_path)
 
     if dry_run:
         logging.info("Dry run was requested; will not attempt Discord upgrade.")
         return
 
-    # FIXME - Need handling for the following:
-    #   dpkg: error: cannot access archive '/tmp/discord-${UUID}': No such file or directory
-    #
-    Popen(["sudo", "dpkg", "-i", f_path], stdout=PIPE, encoding="UTF-8")
+    with Popen(
+        ["sudo", "dpkg", "-i", f_path], stdout=PIPE, stderr=log_level, encoding="UTF-8"
+    ) as dpkg:
+        logging.debug(dpkg.stdout.read())
+
     logging.info("Discord has been updated.")
 
 
