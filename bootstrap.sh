@@ -53,7 +53,7 @@ echo -e "\nUpdating apt repositories and installing dependencies...\n"
 
 apt-get update && \
     apt-get install --assume-yes --no-install-recommends --auto-remove --quiet \
-    git curl python3.11-venv python3-apt  # python3-apt for ansible-playbook --check
+    git curl python3-venv python3-apt  # python3-apt for ansible-playbook --check
 
 mkdir --parents "/home/${INPUT_USERNAME}/code" && \
     mkdir --parents "/home/${INPUT_USERNAME}/venvs/ansible"
