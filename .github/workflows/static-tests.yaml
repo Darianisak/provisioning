@@ -41,14 +41,14 @@ jobs:
         run: ruff --verbose format .
 
   python-unit:
-    env:
-      DISCORD_TOOL_PATH: ansible/roles/discord/bin/updater
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Change workdir to Discord tooling.
         run: cd ${DISCORD_TOOL_PATH}
       - name: Install Pip requirements
+        working-directory: ansible/roles/discord/bin/updater
         run: pip install -r requirements.txt
       - name: Run unittests
+        working-directory: ansible/roles/discord/bin/updater
         run: python3 -m unittest
