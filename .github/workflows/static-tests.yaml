@@ -10,6 +10,7 @@ jobs:
       - name: ShellCheck
         uses: ludeeus/action-shellcheck@master
 
+
   yamllint:
     runs-on: ubuntu-latest
     steps:
@@ -17,9 +18,37 @@ jobs:
       - name: YAML Lint
         uses: ibiqlik/action-yamllint@v3
 
+
   ansiblelint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Ansible-lint
         uses: ansible/ansible-lint@main
+
+
+  python-ruff:
+    env:
+      REQUIREMENTS: ansible/roles/discord/bin/updater/requirements.txt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Ruff.
+        run: pip install -r ${REQUIREMENTS}
+      - name: Check linting.
+        run: ruff --verbose check .
+      - name: Check formatting.
+        run: ruff --verbose format .
+
+  python-unit:
+    env:
+      DISCORD_TOOL_PATH: ansible/roles/discord/bin/updater
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Change workdir to Discord tooling.
+        run: cd ${DISCORD_TOOL_PATH}
+      - name: Install Pip requirements
+        run: pip install -r requirements.txt
+      - name: Run unittests
+        run: python3 -m unittest
