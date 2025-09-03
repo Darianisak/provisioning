@@ -1,6 +1,7 @@
 import sys
 import re
 import logging
+import argparse
 from subprocess import Popen, PIPE
 from uuid import uuid1
 from os import remove
@@ -13,19 +14,23 @@ REQUEST_TIMEOUT = 30
 
 
 def main():
-    # FIXME - Use argparse to support toggling the verbosity.
-    #
-    logging.basicConfig(
-        level=logging.INFO, format="%(levelname)s - %(message)s"
-    )
+    args = parse_args()
 
-    latest_version = get_latest_version_num()
-    logging.info("Upstream version: %s", latest_version)
+    log_level = logging.INFO
+    if args.verbose:
+        log_level = logging.DEBUG
+
+    logging.basicConfig(level=log_level, format="%(levelname)s - %(message)s")
+
+    remote_version = get_latest_version_num()
+    logging.info("Upstream version: %s", remote_version)
 
     installed_version = get_installed_version_num()
     logging.info("Installed version: %s", installed_version)
 
-    if is_version_newer(installed_version, latest_version):
+    is_remote_version_newer("0.0.94", "0.0.107")
+
+    if is_remote_version_newer(installed_version, remote_version):
         logging.info("The installed version is not the most recent!")
     else:
         logging.info("Installed version is up to date!")
@@ -33,12 +38,26 @@ def main():
 
     f_path = f"/tmp/discord-{uuid1()}"
     download_latest(f_path)
-    install_package(f_path)
+    install_package(f_path, dry_run=args.dry_run)
 
     delete_install_file(f_path)
-
-    logging.info("Package installed.")
     sys.exit(0)
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        prog="tandem",
+        description="A Discord upgrade client for Linux.",
+        epilog="Authored by <culver.darian@gmail.com>, licensed under GPL v3.",
+    )
+    parser.add_argument(
+        "-v", "--verbose", action="store_true", help="Enables verbose logging."
+    )
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Toggle whether Discord will be updated."
+    )
+
+    return parser.parse_args()
 
 
 def get_latest_version_num():
@@ -82,6 +101,9 @@ def get_installed_version_num():
 
     version_string = ""
 
+    # FIXME - We should probably use dpkg instead to avoid apt scripting stderr
+    #   `WARNING: apt does not have a stable CLI interface. Use with caution in scripts.`
+    #
     with Popen(["apt", "policy", package_name], stdout=PIPE, encoding="UTF-8") as apt:
         stdout = apt.stdout.read()
 
@@ -94,21 +116,20 @@ def get_installed_version_num():
     return version_string
 
 
-def is_version_newer(version_a: str, version_b: str) -> bool:
+def is_remote_version_newer(local: str, remote: str) -> bool:
     # Naive validation, checks that period is used for delimiting.
     #
-    for ver in version_a, version_b:
+    for ver in local, remote:
         if "." not in ver:
             logging.error("Invalid version format found!")
             sys.exit(1)
 
         continue
 
-    # Split the version string into it's constituent integer parts so we
-    # can 'just' do 1-1 comparisons.
+    # We'll split the strings to make comparisons easier.
     #
-    a = version_a.split(".")
-    b = version_b.split(".")
+    a = local.split(".")
+    b = remote.split(".")
 
     for version in a, b:
         if len(version) != 3:
@@ -117,18 +138,12 @@ def is_version_newer(version_a: str, version_b: str) -> bool:
 
         continue
 
-    log_message = f"Version A, '{version_a}' is older than B, '{version_b}'"
+    if a == b:
+        # If local is the same as remote, than we don't need to update.
+        #
+        return False
 
-    # REFAC - do this with a list comprehension.
-    # FIXME - Cases whereby A is the same as B result in A appearing as older.
-    #
-    for subversion in [0, 1, 2]:
-        if a[subversion] < b[subversion]:
-            logging.info(log_message)
-            return False
-
-    logging.info("Version B is newer!")
-    return True
+    return any(int(b[sub_ver]) > int(a[sub_ver]) for sub_ver in [0, 1, 2])
 
 
 def download_latest(f_path: str):
@@ -146,7 +161,6 @@ def download_latest(f_path: str):
     # FIXME - validate that f_path does not yet exist.
     #
 
-
     logging.debug("Will write install file to %s", f_path)
 
     with requests.get(**request_args) as req:
@@ -163,12 +177,18 @@ def download_latest(f_path: str):
     return f_path
 
 
-def install_package(f_path: str):
+def install_package(f_path: str, dry_run: bool):
     _is_file_present(f_path)
+
+    if dry_run:
+        logging.info("Dry run was requested; will not attempt Discord upgrade.")
+        return
+
     # FIXME - Need handling for the following:
     #   dpkg: error: cannot access archive '/tmp/discord-${UUID}': No such file or directory
     #
     Popen(["sudo", "dpkg", "-i", f_path], stdout=PIPE, encoding="UTF-8")
+    logging.info("Discord has been updated.")
 
 
 def _is_file_present(f_path: str):
