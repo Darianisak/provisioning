@@ -132,12 +132,9 @@ def is_remote_version_newer(local: str, remote: str) -> bool:
     #
     invalid_data_format = "The version strings are not correctly formatted!"
 
-    for ver in local, remote:
-        if "." not in ver:
-            logging.fatal(invalid_data_format)
-            sys.exit(1)
-
-        continue
+    if any("." not in ver_str for ver_str in [local, remote]):
+        logging.fatal(invalid_data_format)
+        sys.exit(1)
 
     # We'll split the strings to make comparisons easier.
     #
