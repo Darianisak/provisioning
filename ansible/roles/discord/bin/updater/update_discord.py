@@ -38,7 +38,7 @@ def main():
     download_latest(f_path)
     install_package(f_path, dry_run=args.dry_run)
 
-    delete_install_file(f_path)
+    remove(f_path)
     sys.exit(0)
 
 
@@ -219,10 +219,6 @@ def _is_file_present(f_path: str):
         sys.exit(1)
 
     logging.debug("Discord download at %s was verified.", f_path)
-
-
-def delete_install_file(f_path: str):
-    remove(f_path)
 
 
 if __name__ == "__main__":
