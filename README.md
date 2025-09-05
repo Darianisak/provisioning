@@ -36,15 +36,6 @@ to catch changes that would make *B run before A*.
 
 For more details, check out *TestTags* documentation, [here][TestTags].
 
-### Tandem
-
-*Tandem* is a *Python* based update client for managing the update lifecycle
-of Discord's Linux desktop application.
-
-*Tandem* was motivated by *lazyness*, more than anything, and not wanting to
-manually install Discord updated.
-
-For more details, check out the *Tandem* documentation, [here][Tandem].
 
 ## Using Provisioning
 
@@ -92,8 +83,7 @@ chmod 0755 bootstrap.sh
 ## FAQ
 ### What distributions has this been tested with?
 
-The entire *Provisioning* suite has been tested with Debian Bookworm, and
-*aspects* of it, e.g., *Tandem*, have been tested with Ubuntu Noble.
+The entire *Provisioning* suite has been tested with Debian Bookworm.
 
 There's only a few *hard* requirements a system must meet to use *Provisioning*:
 
@@ -125,4 +115,3 @@ remote hosts, though we aren't doing that yet.
 [Steam]: https://store.steampowered.com/
 [Steam-Issue]: https://github.com/ValveSoftware/steam-for-linux/issues/7284#issuecomment-2414009466
 [TestTags]: https://github.com/Darianisak/provisioning/blob/main/integration-tests/README.md
-[Tandem]: https://github.com/Darianisak/provisioning/blob/main/ansible/roles/discord/bin/updater/README.md
