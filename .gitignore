@@ -4,3 +4,6 @@ integration-tests/tag-regressions/expected/.*.txt
 .ansible
 __pycache__/
 unityhub/
+build/
+dist/
+*.spec

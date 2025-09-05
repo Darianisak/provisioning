@@ -1,0 +1,24 @@
+---
+name: Build Tasks
+on: [push]
+
+jobs:
+  tandem-binary:
+    runs-on: ubuntu-latest
+    container: python:3.11-bookworm
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install requirements
+        working-directory: ansible/roles/discord/bin/updater
+        run: pip install -r requirements.txt
+
+      - name: Build Binary File
+        working-directory: ansible/roles/discord/bin/updater
+        run: pyinstaller update_discord.py --onefile --name tandem
+
+      - name: Publish Binary file as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tandem
+          path: ansible/roles/discord/bin/updater/dist
