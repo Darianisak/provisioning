@@ -9,11 +9,41 @@
 *does not* auto update.
 
 With *Tandem*, what used to be a multi click process is now a simple command,
-and one that *can also* be run in the background.
+which *can also* be run in the background.
 
 ## Using Tandem
 
-Using *Tandem* is easy, *but* it does assume you have a few things installed:
+If you're *not* planning on poking around with *Tandem's* source code, then
+you can use the pre-built binary executable.
+
+This binary can be downloaded from the project's releases, [here][Releases].
+
+Once you've downloaded the appropriate binary, it can be run like so:
+
+``` bash
+cd ~/Downloads
+
+./tandem --help
+
+"""
+usage: tandem [-h] [-v] [--dpkg-verbose] [--dry-run]
+
+A Discord upgrade client for Linux.
+
+options:
+  -h, --help      show this help message and exit
+  -v, --verbose   Enables verbose logging.
+  --dpkg-verbose  Enables dpkg verbose logging.
+  --dry-run       Toggle whether Discord will be updated.
+
+Authored by <culver.darian@gmail.com>, licensed under GPL v3.
+"""
+```
+
+## Using Tandem *during* development
+
+Using *Tandem* during development is easy, *but* it does assume you have a
+few things installed:
 
 * dpkg
 * git
@@ -94,14 +124,56 @@ Authored by <culver.darian@gmail.com>, licensed under GPL v3.
 """
 ```
 
+## Building Tandem
+
+*Tandem* is build using [PyInstaller], which complies the tool into a single
+binary file.
+
+*Assuming* you already have the project checked out under `/tmp/tandem`, the
+next step would be to create a virtual environment:
+
+``` bash
+cd /tmp/tandem/provisioning
+python3 -m venv .venv
+source .venv/bin/activate
+pip install --requirement ansible/roles/discord/bin/updater/requirements.txt
+
+```
+
+Then, we'll run the build process:
+
+``` bash
+cd ansible/roles/discord/bin/updater
+pyinstaller update_discord.py --onefile --name tandem
+```
+
+Alongside a number of build artifacts, this will produce a single executable
+binary file:
+
+``` bash
+cd dist
+
+./tandem --help
+
+"""
+usage: tandem [-h] [-v] [--dpkg-verbose] [--dry-run]
+
+A Discord upgrade client for Linux.
+
+options:
+  -h, --help      show this help message and exit
+  -v, --verbose   Enables verbose logging.
+  --dpkg-verbose  Enables dpkg verbose logging.
+  --dry-run       Toggle whether Discord will be updated.
+
+Authored by <culver.darian@gmail.com>, licensed under GPL v3.
+"""
+```
+
 ## FAQ
 ### What distributions has this been tested with?
 
 *Tandem* has been tested with both Ubuntu Noble and Debian Bookwork.
-
-### Is there a binary?
-
-Not yet, but soon!
 
 ### What if I already have Discord installed?
 
@@ -116,3 +188,5 @@ attempt to do anything.
 
 [dpkg]: https://man7.org/linux/man-pages/man1/dpkg.1.html
 [Discord]: https://discord.com/
+[PyInstaller]: https://pyinstaller.org/en/stable/index.html
+[Releases]: https://github.com/Darianisak/provisioning/releases
