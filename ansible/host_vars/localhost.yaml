@@ -18,8 +18,8 @@ apt:
     - yq
     - python3-pip
     - keepassxc  # TODO - Need a solution for pull key dbs.
-    - lutris
     - gpg
+    - chromium
 
 
 su_user: root
