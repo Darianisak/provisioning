@@ -1,0 +1,49 @@
+---
+
+- name: Gather installed package lists.
+  vars:
+    apt_action_type: 'installed'
+  ansible.builtin.include_role:
+    name: apt
+  tags:
+    - flatpak
+
+
+- name: Install Flatpak
+  vars:
+    dependencies:
+      - flatpak
+      - gnome-software-plugin-flatpak  # Assumes GNOME
+  tags:
+    - flatpak
+  ansible.builtin.apt:
+    update_cache: true
+    name:
+      - "{{ item }}"
+  with_items: "{{ dependencies | difference(apt_installed_packages) }}"
+
+
+- name: Refresh installed package lists.
+  vars:
+    apt_action_type: 'installed'
+  ansible.builtin.include_role:
+    name: apt
+  tags:
+    - flatpak
+
+
+- name: Add Flatpak remote
+  when: "'flatpak' in apt_installed_packages"
+  tags:
+    - flatpak
+  vars:
+    flathub_url: https://dl.flathub.org/repo/flathub.flatpakrepo
+  ansible.builtin.command:
+    cmd: flatpak remote-add --if-not-exists flathub {{ flathub_url }}
+  changed_when: false  # idempotent
+  register: flatpak_remote_state
+
+
+# TODO - we should be configuring Creality here, as well.
+#   ref: https://github.com/CrealityOfficial/CrealityPrint/releases
+#

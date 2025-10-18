@@ -20,8 +20,6 @@ apt:
     - keepassxc  # TODO - Need a solution for pull key dbs.
     - gpg
     - chromium
-    - flatpak
-    - gnome-software-plugin-flatpak  # Assumes GNOME
 
 
 su_user: root
