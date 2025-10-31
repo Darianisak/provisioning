@@ -20,7 +20,7 @@ apt:
     - keepassxc  # TODO - Need a solution for pull key dbs.
     - gpg
     - chromium
-
+    - color-picker
 
 su_user: root
 su_group: root
