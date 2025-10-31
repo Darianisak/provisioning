@@ -32,24 +32,16 @@
     - flatpak
 
 
-# TODO: The conditionality of this play could be better; i.e., check the remote
-# list before getting here, rather than relying on the no-op.
-#
-- name: Add Flatpak remote
+- name: Define required flatpak remotes
   when: "'flatpak' in apt_installed_packages"
   tags:
     - flatpak
-  vars:
-    flathub_url: https://dl.flathub.org/repo/flathub.flatpakrepo
-  ansible.builtin.command:
-    cmd: flatpak remote-add --if-not-exists flathub {{ flathub_url }}
-  changed_when: false
-  register: flatpak_remote_state
+  community.general.flatpak_remote:
+    name: "{{ item.remote.name }}"
+    state: present
+    flatpakrepo_url: "{{ item.remote.url }}"
+  with_items: "{{ flatpak.default_remotes }}"
 
-
-# TODO - we should be configuring Creality here, as well.
-#   ref: https://github.com/CrealityOfficial/CrealityPrint/releases
-#
 
 - name: Check current Flatpak packages
   when: "'flatpak' in apt_installed_packages"
@@ -62,9 +54,17 @@
   register: flatpak_installed_packages
 
 
+# TODO - we should be configuring Creality here, as well.
+#   ref: https://github.com/CrealityOfficial/CrealityPrint/releases
+#
+# The 'problem' with Creality is that it isn't hosted on a Flatpak repository,
+# so we'd need wget or something to grab the release binary and THEN we can
+# install it with `flatpak install $DWN_PATH`
+#
+
 # https://docs.ansible.com/ansible/latest/collections/community/general/flatpak_module.html
 #
-- name: Install system Flatpak packages as required
+- name: Install managed system Flatpak packages as required
   vars:
     packages: "{{ flatpak.default_packages }}"
   tags:
