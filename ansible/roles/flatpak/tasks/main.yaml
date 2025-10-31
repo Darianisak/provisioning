@@ -32,6 +32,9 @@
     - flatpak
 
 
+# TODO: The conditionality of this play could be better; i.e., check the remote
+# list before getting here, rather than relying on the no-op.
+#
 - name: Add Flatpak remote
   when: "'flatpak' in apt_installed_packages"
   tags:
@@ -40,10 +43,34 @@
     flathub_url: https://dl.flathub.org/repo/flathub.flatpakrepo
   ansible.builtin.command:
     cmd: flatpak remote-add --if-not-exists flathub {{ flathub_url }}
-  changed_when: false  # idempotent
+  changed_when: false
   register: flatpak_remote_state
 
 
 # TODO - we should be configuring Creality here, as well.
 #   ref: https://github.com/CrealityOfficial/CrealityPrint/releases
 #
+
+- name: Check current Flatpak packages
+  when: "'flatpak' in apt_installed_packages"
+  tags:
+    - flatpak
+  ansible.builtin.shell:
+    cmd: set -o pipefail && flatpak list --columns=application | tail -n +1
+    executable: /bin/bash
+  changed_when: false  # Legitimately idempotent
+  register: flatpak_installed_packages
+
+
+# https://docs.ansible.com/ansible/latest/collections/community/general/flatpak_module.html
+#
+- name: Install system Flatpak packages as required
+  vars:
+    packages: "{{ flatpak.default_packages }}"
+  tags:
+    - flatpak
+  when: "flatpak.default_packages is not subset(flatpak_installed_packages)"
+  community.general.flatpak:
+    name: "{{ item }}"
+    state: present  # We won't assert upgrades.
+  with_items: "{{ packages | difference(flatpak_installed_packages) }}"

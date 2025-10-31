@@ -12,6 +12,13 @@ Checking what tasks are available in an Ansible playbook:
 ansible-playbook $PLAYBOOK_FILE --list-tasks -K
 ```
 
+Installing Ansible Galaxy dependencies:
+
+``` bash
+source .venv/bin/activate
+ansible-galaxy install -r ansible/requirements.yaml
+```
+
 Start Ansible from a specific task:
 
 ``` bash

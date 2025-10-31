@@ -23,6 +23,10 @@ apt:
     - color-picker
     - mtr
 
+flatpak:
+  default_packages:
+    - "com.logseq.Logseq"
+
 su_user: root
 su_group: root
 docker_group: docker
