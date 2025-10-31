@@ -21,6 +21,7 @@ apt:
     - gpg
     - chromium
     - color-picker
+    - mtr
 
 su_user: root
 su_group: root
