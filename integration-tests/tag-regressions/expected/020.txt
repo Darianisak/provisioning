@@ -1,0 +1,10 @@
+Test 020 - # Check configuration order for Flatpak.
+
+
+playbook: ansible/provision.yaml
+
+  play #1 (localhost): Provision system	TAGS: []
+    tasks:
+      Gather installed package lists.	TAGS: [flatpak]
+      flatpak : Install Flatpak	TAGS: [flatpak]
+      Refresh installed package lists.	TAGS: [flatpak]

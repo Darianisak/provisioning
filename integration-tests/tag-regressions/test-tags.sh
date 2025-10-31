@@ -74,3 +74,5 @@ run_test "017" "--tags minecraft" "# Check configuration order for Minecraft."
 run_test "018" "--tags unity" "# Check configuration order for Unity."
 
 run_test "019" "--tags discord" "# Check configuration order for Discord."
+
+run_test "020" "--tags flatpak" "# Check configuration order for Flatpak."

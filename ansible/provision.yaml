@@ -9,6 +9,7 @@
   debugger: 'on_failed'
   roles:
     - default_tasks
+    - flatpak
     - docker
     - codium
     - nvidia
