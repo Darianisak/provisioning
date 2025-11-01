@@ -37,9 +37,9 @@
   tags:
     - flatpak
   community.general.flatpak_remote:
-    name: "{{ item.remote.name }}"
+    name: "{{ item.name }}"
     state: present
-    flatpakrepo_url: "{{ item.remote.url }}"
+    flatpakrepo_url: "{{ item.url }}"
   with_items: "{{ flatpak.default_remotes }}"
 
 
