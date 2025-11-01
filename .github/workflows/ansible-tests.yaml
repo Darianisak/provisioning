@@ -6,6 +6,8 @@ on: [push, pull_request]
 jobs:
   tagcheck:
     runs-on: ubuntu-latest
+    container:
+      image: python:3.11-bookworm
     env:
       INPUT_USERNAME: www-data
     steps:

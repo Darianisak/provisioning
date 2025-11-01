@@ -24,6 +24,8 @@ jobs:
 
   ansiblelint:
     runs-on: ubuntu-latest
+    container:
+      image: python:3.11-bookworm
     steps:
       - uses: actions/checkout@v4
 
