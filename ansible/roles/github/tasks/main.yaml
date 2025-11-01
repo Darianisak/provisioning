@@ -29,10 +29,14 @@
   vars:
     # FIXME: This is almost certainly a bad way of doing this.
     #
+    # yamllint disable-line rule:line-length
     gh_ns: "{{ github.debs | items2dict(key_name='name', value_name='namespace') }}"  # noqa: yaml[line-length]
+    # yamllint disable-line rule:line-length
     version: "{{ github.debs | items2dict(key_name='name', value_name='version') }}"  # noqa: yaml[line-length]
+    # yamllint disable-line rule:line-length
     file: "{{ github.debs | items2dict(key_name='name', value_name='file_name') }}"  # noqa: yaml[line-length]
   ansible.builtin.apt:
+    # yamllint disable-line rule:line-length
     deb: "https://github.com/{{ gh_ns[item] }}/releases/download/v{{ version[item] }}/{{ file[item] }}"  # noqa: yaml[line-length]
     state: present
   with_items: "{{ github_required_debs | difference(apt_installed_packages) }}"
@@ -50,10 +54,14 @@
   vars:
     # FIXME: This is almost certainly a bad way of doing this.
     #
+    # yamllint disable-line rule:line-length
     gh_ns: "{{ github.bins | items2dict(key_name='name', value_name='namespace') }}"  # noqa: yaml[line-length]
+    # yamllint disable-line rule:line-length
     version: "{{ github.bins | items2dict(key_name='name', value_name='version') }}"  # noqa: yaml[line-length]
+    # yamllint disable-line rule:line-length
     file: "{{ github.bins | items2dict(key_name='name', value_name='file_name') }}"  # noqa: yaml[line-length]
   ansible.builtin.get_url:
+    # yamllint disable-line rule:line-length
     url: "https://github.com/{{ gh_ns[item] }}/releases/download/v{{ version[item] }}/{{ file[item] }}"  # noqa: yaml[line-length]
     dest: "/usr/local/bin/{{ item }}"
     mode: "0755"
