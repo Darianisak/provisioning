@@ -55,7 +55,7 @@ https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_debugger.html#r
 
 `p task_vars` for variables
 
-`p result._result` for job output
+`p result._return_data` for job output
 
 `p task_vars['ansible_facts]` to 'drill down' into the `ansible_facts` for this host.
 
