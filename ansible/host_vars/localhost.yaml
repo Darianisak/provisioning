@@ -30,6 +30,22 @@ flatpak:
     - name: flathub
       url: https://dl.flathub.org/repo/flathub.flatpakrepo
 
+github:
+  debs:
+    - name: dive
+      version: 0.13.1
+      file_name: dive_0.13.1_linux_amd64.deb
+      namespace: wagoodman/dive
+    - name: trivy:i386
+      version: 0.67.2
+      file_name: trivy_0.67.2_Linux-32bit.deb
+      namespace: aquasecurity/trivy
+  bins:
+    - name: hadolint
+      version: 2.14.0
+      file_name: hadolint-linux-x86_64
+      namespace: hadolint/hadolint
+
 su_user: root
 su_group: root
 docker_group: docker
