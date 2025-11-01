@@ -28,9 +28,8 @@
   with_items: "{{ dependencies | difference(apt_installed_packages) }}"
 
 
-# While we *do* have a bespoke tool for installing Discord, that's more intended
-# as a lifecycle management device, i.e., for automating updates. Doing the
-# initial install with Ansible's built-ins is more correct.
+# It's more correct to handle initial installation here rather than relying
+# on the `tandem` binary.
 #
 - name: Install Discord
   tags:
@@ -57,8 +56,3 @@
       ansible.builtin.file:
         state: absent
         path: "{{ temp_path }}"
-
-
-# TODO - we'll want to install the compiled bin of our installation tool,
-# so we don't need to deal with Python dependencies in system scope.
-#
