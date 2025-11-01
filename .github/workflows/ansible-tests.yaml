@@ -1,14 +1,21 @@
 ---
 name: Ansible Tests
-on: [push, pull_request]
+# yamllint disable-line rule:truthy
+on: [pull_request]
 
 jobs:
   tagcheck:
     runs-on: ubuntu-latest
+    container:
+      image: python:3.11-bookworm
     env:
       INPUT_USERNAME: www-data
     steps:
       - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: >
+          apt update
+          && apt install sudo --assume-yes --no-install-recommends
 
       # FIXME - there must be a more native way to transport environment
       # variables between env.vars and the bash script environment.

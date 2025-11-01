@@ -1,6 +1,7 @@
 ---
 name: Static Tests
-on: [push, pull_request]
+# yamllint disable-line rule:truthy
+on: [pull_request]
 
 jobs:
   shellcheck:
@@ -23,8 +24,24 @@ jobs:
 
   ansiblelint:
     runs-on: ubuntu-latest
+    container:
+      image: python:3.11-bookworm
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install dependencies
+        run: >
+          apt update
+          && apt install --assume-yes --no-install-recommends \
+            sudo lsb-release
+
+      - name: Mark as safe for git
+        run: >
+          git config --global \
+            --add safe.directory /__w/provisioning/provisioning
+
       - name: Ansible-lint
         uses: ansible/ansible-lint@main
+        with:
+          setup_python: false
+          requirements_file: ansible/requirements.yaml

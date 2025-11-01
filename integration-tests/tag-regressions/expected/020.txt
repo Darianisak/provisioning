@@ -8,3 +8,6 @@ playbook: ansible/provision.yaml
       Gather installed package lists.	TAGS: [flatpak]
       flatpak : Install Flatpak	TAGS: [flatpak]
       Refresh installed package lists.	TAGS: [flatpak]
+      flatpak : Define required flatpak remotes	TAGS: [flatpak]
+      flatpak : Check current Flatpak packages	TAGS: [flatpak]
+      flatpak : Install managed system Flatpak packages as required	TAGS: [flatpak]

@@ -23,6 +23,14 @@ apt:
     - color-picker
     - mtr
 
+flatpak:
+  default_packages:
+    - "com.logseq.Logseq"
+  default_remotes:
+    - remote:
+        name: flathub
+        url: https://dl.flathub.org/repo/flathub.flatpakrepo
+
 su_user: root
 su_group: root
 docker_group: docker
