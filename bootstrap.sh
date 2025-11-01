@@ -66,8 +66,12 @@ mkdir --parents "/home/${INPUT_USERNAME}/code" && \
 echo -e "\nDownloading Ansible requirements...\n"
 curl "${BASE_REPOSITORY_URL}/${GIT_BRANCH}/${ANSIBLE_REQUIREMENTS}" --output \
     "/home/${INPUT_USER}/.ansible-requirements.txt"
-
 cat "/home/${INPUT_USER}/.ansible-requirements.txt"
+
+curl "${BASE_REPOSITORY_URL}/${GIT_BRANCH}/ansible/requirements.yaml" --output \
+    "/home/${INPUT_USER}/.galaxy-requirements.txt"
+cat "/home/${INPUT_USER}/.galaxy-requirements.txt"
+
 
 echo -e "\nAmending ownerships with chown (/dev/null)...\n"
 chown --verbose --preserve-root --recursive "${INPUT_USERNAME}:${INPUT_USERNAME}" \
@@ -80,5 +84,8 @@ echo -e "\nInstalling Ansible requirements for ansible-venv...\n"
 pip --require-virtualenv install --requirement \
     "/home/${INPUT_USER}/.ansible-requirements.txt"
 
+ansible-galaxy install -r "/home/${INPUT_USER}/.galaxy-requirements.txt"
+
 deactivate
 rm "/home/${INPUT_USER}/.ansible-requirements.txt"
+rm "/home/${INPUT_USER}/.galaxy-requirements.txt"

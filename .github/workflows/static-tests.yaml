@@ -29,5 +29,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install dependencies
+        run: >
+          apt update
+          && apt install --assume-yes --no-install-recommends \
+            sudo lsb-release
+
+      - name: Mark as safe for git
+        run: >
+          git config --global \
+            --add safe.directory /__w/provisioning/provisioning
+
       - name: Ansible-lint
         uses: ansible/ansible-lint@main
+        with:
+          setup_python: false
+          requirements_file: ansible/requirements.yaml
