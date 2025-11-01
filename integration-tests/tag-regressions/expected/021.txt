@@ -1,0 +1,12 @@
+Test 021 - # Check configuration order for packages from GitHub.
+
+
+playbook: ansible/provision.yaml
+
+  play #1 (localhost): Provision system	TAGS: []
+    tasks:
+      Gather installed package lists.	TAGS: [github]
+      Ensure i386 packages can be installed	TAGS: [github]
+      github : Get list of required GitHub debs	TAGS: [github]
+      github : Install debs from GitHub releases	TAGS: [github]
+      github : Install binaries from GitHub releases	TAGS: [github]
