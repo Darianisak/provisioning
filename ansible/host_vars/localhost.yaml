@@ -45,6 +45,10 @@ github:
       version: 2.14.0
       file_name: hadolint-linux-x86_64
       namespace: hadolint/hadolint
+    - name: tandem
+      version: 0.1.0
+      file_name: tandem
+      namespace: Darianisak/Tandem
 
 su_user: root
 su_group: root
