@@ -69,8 +69,8 @@ curl "${BASE_REPOSITORY_URL}/${GIT_BRANCH}/${ANSIBLE_REQUIREMENTS}" --output \
 cat "/home/${INPUT_USER}/.ansible-requirements.txt"
 
 curl "${BASE_REPOSITORY_URL}/${GIT_BRANCH}/ansible/requirements.yaml" --output \
-    "/home/${INPUT_USER}/.galaxy-requirements.txt"
-cat "/home/${INPUT_USER}/.galaxy-requirements.txt"
+    "/home/${INPUT_USER}/.galaxy-requirements.yaml"
+cat "/home/${INPUT_USER}/.galaxy-requirements.yaml"
 
 
 echo -e "\nAmending ownerships with chown (/dev/null)...\n"
@@ -84,8 +84,8 @@ echo -e "\nInstalling Ansible requirements for ansible-venv...\n"
 pip --require-virtualenv install --requirement \
     "/home/${INPUT_USER}/.ansible-requirements.txt"
 
-ansible-galaxy install -r "/home/${INPUT_USER}/.galaxy-requirements.txt"
+ansible-galaxy install -r "/home/${INPUT_USER}/.galaxy-requirements.yaml"
 
 deactivate
 rm "/home/${INPUT_USER}/.ansible-requirements.txt"
-rm "/home/${INPUT_USER}/.galaxy-requirements.txt"
+rm "/home/${INPUT_USER}/.galaxy-requirements.yaml"
