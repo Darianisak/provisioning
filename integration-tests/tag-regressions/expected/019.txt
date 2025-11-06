@@ -6,7 +6,9 @@ playbook: ansible/provision.yaml
   play #1 (localhost): Provision system	TAGS: []
     tasks:
       Gather installed package lists.	TAGS: [discord]
+      discord : Check if Tandem is present.	TAGS: [discord]
       discord : Install Discord dependencies	TAGS: [discord]
       discord : Download Discord .deb	TAGS: [discord]
       discord : Install Discord .deb	TAGS: [discord]
       discord : Remove Discord installation .deb	TAGS: [discord]
+      discord : Setup Discord update crontab	TAGS: [discord]
