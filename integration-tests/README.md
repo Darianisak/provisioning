@@ -6,27 +6,6 @@ This directory contains scripts for assisting with manually testing the system p
 
 ## Helper commands
 
-Checking what tasks are available in an Ansible playbook:
-
-``` bash
-ansible-playbook $PLAYBOOK_FILE --list-tasks -K
-```
-
-Installing Ansible Galaxy dependencies:
-
-``` bash
-source .venv/bin/activate
-ansible-galaxy install -r ansible/requirements.yaml
-```
-
-Start Ansible from a specific task:
-
-``` bash
-ansible-playbook $PLAYBOOK_FILE --start-at-task $TASK_NAME --verbose -K
-```
-
-Note: Password, `-K` is `foo` - defined in Dockerfile.
-
 Run the test suite:
 
 ``` bash
@@ -34,13 +13,6 @@ docker compose run --remove-orphans --build --interactive -t testing
 
 ./opt/integration-tests/tag-regressions/test-tags.sh
 ```
-
-Provision a system:
-
-``` bash
-ansible-playbook provision.yaml -K --ask-vault-pass`
-```
-
 
 Create a basic system user account for validating ownership, etc. (interactive)
     N.B. Maybe investigate the Ansible user module?
