@@ -9,6 +9,14 @@
     - discord
 
 
+- name: Check if Tandem is present.
+  ansible.builtin.stat:
+    path: /usr/local/bin/tandem
+  register: discord_tandem_state
+  tags:
+    - discord
+
+
 - name: Install Discord dependencies
   vars:
     dependencies:
@@ -56,3 +64,15 @@
       ansible.builtin.file:
         state: absent
         path: "{{ temp_path }}"
+
+
+- name: Setup Discord update crontab
+  tags:
+    - discord
+  when: discord_tandem_state.stat.exists
+  ansible.builtin.template:
+    src: templates/cron.j2
+    dest: /etc/cron.d/tandem
+    owner: "{{ su_user }}"
+    group: "{{ su_group }}"
+    mode: "0644"

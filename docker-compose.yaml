@@ -5,7 +5,6 @@ services:
       dockerfile: ./Dockerfile
       args:
         INPUT_USERNAME: ${USER}
-        VOL_MOUNT: /opt
     volumes:
       - ./:/opt
       - "/home/${USER}/.ansible:/home/${USER}/.ansible"

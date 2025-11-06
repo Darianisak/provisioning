@@ -4,17 +4,17 @@
 *Provisioning* is an automation tool set, built on [Ansible], which brings
 enterprise configuration management and [IaC] principles to home systems.
 
-*Provisionings* value add is that it can take a clean system install and
+*Provisioning's* value add is that it can take a clean system install and
 handle everything from Codium preferences to Video Game launchers *and*
 their dependencies, in as little as 5 minutes.
 
 ## Motivation
 
 After one-to-many system rebuilds, I got fed up with redefining apt-sources,
-reading obscure documentation, and just generally not being able to use my PC.
+reading documentation, and generally being unable to use my computer.
 
 This reached a breaking point while installing [Steam], which has a number of
-[undeclared dependencies][Steam-Issue] in the Debian documentation.
+[dependencies][Steam-Issue] that aren't mentioned on the Debian wiki.
 
 So, having a background in DevOps and experience with Ansible, I set about
 codifying *my entire* home PC - this project is the ongoing result of
@@ -36,8 +36,7 @@ to catch changes that would make *B run before A*.
 
 For more details, check out *TestTags* documentation, [here][TestTags].
 
-
-## Using Provisioning
+## Using
 
 When we talk about *Provisioning*, we're typically referring to the [Ansible]
 'core', but there's a few different ways we can use the software.
@@ -80,6 +79,93 @@ chmod 0755 bootstrap.sh
 <!--  -->
 <!-- ## Enhancing Provisioning -->
 <!--  -->
+
+### Selectively
+
+Say you wanted to install [Codium] with extensions, settings, and themes with
+one command - *provisioning* let's you do that.
+
+Assuming you've got a [Development](#development) checkout, this type of
+operation would look like:
+
+``` bash
+source .venv
+cd provisioning/ansible
+ansible-playbook -K provision.yaml --tags codium
+```
+
+## Development
+
+Ansible can be cumbersome to develop for, so *provisioning* makes an effort
+to provide a repeatable and easily extendable dev work flow.
+
+### Preparing a dev environment
+
+Development environment set up is reasonably standard:
+
+``` bash
+# Cloning the checkout
+#
+git clone git@github.com:Darianisak/provisioning.git
+
+# Preparing the dev virtual environment
+#
+cd provisioning
+python3 -m venv .venv
+source .venv
+
+# Installing Python dependencies
+#
+pip install -r ansible-requirements.txt
+
+# Installing Ansible dependencies
+#
+ansible-galaxy install -r ansible/requirements.yaml
+```
+
+### Testing with Docker
+
+Once you've written a play and would like to test that it *actually* works,
+we can spin up a Docker container to isolate the filesystem changes.
+
+``` bash
+cd provisioning
+
+# Use `docker compose` to manage the life cycle of our container.
+# `--remove-orphans` is provided to ensure we clean up old containers and don't
+# run into service name collision.
+#
+docker compose run --remove-orphans -it testing
+
+# Navigate to the `ansible` directory. Our venv is already sourced in the shell.
+#
+cd ansible
+
+# Now run Ansible against your play's tag with `--tags`
+# `-K` will prompt you for the super user password, which is `foo`.
+#
+ansible-playbook provision.yaml --tags $YOUR_PLAY_TAG -K
+
+# You can also check *what* tags are available
+#
+ansible-playbook provision.yaml --list-tags
+
+# If your play requires the Ansible vault, you'll need to provide your
+# vault credentials
+#
+ansible-playbook provision.yaml --tags $YOUR_PLAY_TAG -K --ask-vault-pass
+```
+
+Please note that this workflow relies on the use of [Ansible Tags].
+
+### Using the Ansible debugger
+
+TODO
+
+### Checking for execution order changes with TestTags
+
+TODO
+
 ## FAQ
 ### What distributions has this been tested with?
 
@@ -87,10 +173,13 @@ The entire *Provisioning* suite has been tested with Debian Bookworm.
 
 There's only a few *hard* requirements a system must meet to use *Provisioning*:
 
-* Python3
-* Dpkg
-* Apt
-* Being connected to the internet
+* The following software installed:
+    * `python3`
+    * `dpkg`
+    * `apt`
+    * `openssl`
+    * `sudo`
+* An internet connection
 
 ### This seems like a lot of overhead
 
@@ -115,3 +204,5 @@ remote hosts, though we aren't doing that yet.
 [Steam]: https://store.steampowered.com/
 [Steam-Issue]: https://github.com/ValveSoftware/steam-for-linux/issues/7284#issuecomment-2414009466
 [TestTags]: https://github.com/Darianisak/provisioning/blob/main/integration-tests/README.md
+[Codium]: https://vscodium.com/
+[Ansible Tags]: https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_tags.html
