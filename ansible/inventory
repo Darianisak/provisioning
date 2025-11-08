@@ -1,2 +1,5 @@
 [default]
 localhost
+
+[digital_ocean]
+170.64.179.222

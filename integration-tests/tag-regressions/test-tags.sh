@@ -53,28 +53,25 @@ function run_test() {
 
 echo -e "\nRunning Naive regression tests...\n\n"
 
+# Tag regression tests for `provision.yaml`
+#
+
 run_test "001" " " "# Check the 'default' provisioning order"
-
 run_test "004" "--tags docker" "# Check docker installation steps"
-
 run_test "006" "--tags spotify" "# Check spotify installation steps"
-
 run_test "007" "--tags codium" "# Check Codium installation steps"
-
 run_test "011" "--tags nvidia" "# Check nVidia installation order"
-
 run_test "013" "--tags steam" "# Check configuration order for Steam"
-
 run_test "014" "--tags git" "# Check git configuration order."
-
 run_test "016" "--tags keys" "# Check SSH configuration order."
-
 run_test "017" "--tags minecraft" "# Check configuration order for Minecraft."
-
 run_test "018" "--tags unity" "# Check configuration order for Unity."
-
 run_test "019" "--tags discord" "# Check configuration order for Discord."
-
 run_test "020" "--tags flatpak" "# Check configuration order for Flatpak."
-
 run_test "021" "--tags github" "# Check configuration order for packages from GitHub."
+
+# Tag regression tests for `remote.yaml`
+#
+
+DEFAULT_ARGS="ansible/remote.yaml --list-tasks --inventory ansible/inventory"
+run_test "022" " " "# Check the 'default' remote provisioning order"
