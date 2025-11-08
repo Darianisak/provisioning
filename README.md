@@ -43,10 +43,12 @@ When we talk about *Provisioning*, we're typically referring to the [Ansible]
 
 ### From a cold install
 
+TODO - this section is under construction!
+
 Using *Provisioning* to set up a system after installing the Operating System
 is the *exact* use case this tool was written for.
 
-#### 1: Run the setup script
+#### Run the setup script
 
 We'll first define *what* our username is:
 
@@ -92,6 +94,18 @@ operation would look like:
 source .venv
 cd provisioning/ansible
 ansible-playbook -K provision.yaml --tags codium
+```
+
+### Against a remote host
+
+*Provisioning* also supports defining remote environments via playbooks:
+
+``` bash
+cd provisioning
+source .venv/bin/activate
+cd ansible
+
+ansible-playbook remote.yaml --inventory inventory
 ```
 
 ## Development
@@ -160,11 +174,95 @@ Please note that this workflow relies on the use of [Ansible Tags].
 
 ### Using the Ansible debugger
 
-TODO
+Ansible has support for a pretty decent interactive run-time debugger, but
+the upstream documentation is pretty lacking.
+
+#### Setting breakpoints
+
+To use the debugger, you'll need to add the `debugger` attribute to your plays.
+
+``` yaml
+# A 'debugger' that will trigger every time this play is run.
+#
+# This is generally pretty helpful during active development of a play.
+#
+- name: a test play
+  debugger: 'always'
+  ansible.builtin.command:
+    cmd: echo "hello world"
+
+# A 'debugger' that will *only* trigger given a play failure.
+#
+# I find this pretty handy to define for the top level play, that way any
+# failure gets caught and we can dig into the problematic state.
+#
+- name: a test play
+  debugger: 'on_failed'
+  ansible.builtin.command:
+    cmd: echo "hello world"
+```
+
+For further details on setting breakpoints, check out the upstream
+[Ansible Debugger] documentation.
+
+#### Getting value from the debugger
+
+Once you've had a [breakpoint](#setting-breakpoints) trigger, you'll get
+dumped into an interactive Python shell with a little bit of syntactic sugar.
+
+While the [documentation][Ansible Debugger] covers the individual commands,
+it doesn't do a good job of explaining *how* you can use those commands, so...
+
+``` bash
+# Getting ALL the variables present for this task.
+#
+p task_vars
+
+# Getting the response/return for a task - both success and failure.
+#
+p result._return_data
+
+# Getting the 'ansible_facts' variable out of the current var scope.
+#
+p task_vars['ansible_facts']
+```
+
+A *really* cool thing to realize with the debugger is that Ansible works
+*exclusively* with Python objects, so you can use the interactive debugger in
+the same you would a Python REPL with much the same functions:
+
+``` python
+# Converting the response to a list and then get the len of the response.
+#
+p len(list(result._result_data))
+
+# Getting the valid functions for a given Ansible object
+#
+p dir(task_vars)
+```
 
 ### Checking for execution order changes with TestTags
 
-TODO
+If you've worked with large Ansible code bases before, you'll know that
+refactors and other changes can modify the execution order quite dramatically.
+
+For that reason, I wrote the TestTags tool, which takes a manifest of the
+entire play (based on tags) and tracks it in git for easy regression analysis.
+
+These checks can be run like so:
+
+``` bash
+docker compose run --remove-orphans -it testing
+
+# Run `TestTags` to get the apply manifest.
+#
+./opt/integration-tests/tag-regressions/test-tags.sh
+
+# Manually diff the manifests for regressions
+#
+cd /opt/integration-tests/tag-regressions/expected
+diff .001.txt 001.txt
+```
 
 ## FAQ
 ### What distributions has this been tested with?
@@ -206,3 +304,4 @@ remote hosts, though we aren't doing that yet.
 [TestTags]: https://github.com/Darianisak/provisioning/blob/main/integration-tests/README.md
 [Codium]: https://vscodium.com/
 [Ansible Tags]: https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_tags.html
+[Ansible Debugger]: https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_debugger.html
