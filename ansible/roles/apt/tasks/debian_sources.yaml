@@ -1,43 +1,24 @@
 ---
 
-# FIXME : We probably want to diff the template against deployed.
-- name: Check if managed sources are deployed
-  ansible.builtin.stat:
-    path: "{{ apt.managed }}"
-  register: apt_managed_state
-
-
-# Apt sources can vary depending on installation method, so...
-#   a) Find wherever the debian sources file is
-#   b) Delete it
-#   c) Populate a managed one.
-# We remove this so we avoid duplicate source warnings.
+# By default, debian apt sources are deployed to /etc/apt/sources.list.d/*
+# so, we'll just use the documented default paths and apply changes
+# as required.
 #
-- name: Deploy managed debian apt sources
-  become: true
-  become_user: "{{ su_user }}"
-  when: not apt_managed_state['stat']['exists']
-  block:
-    - name: Find pre-generated debian source files
-      ansible.builtin.find:
-        paths:
-          - /etc/apt/
-        contains: "deb.debian.org"
-        read_whole_file: true
-        recurse: true
-      register: apt_deb_source
-      failed_when: "apt_deb_source['files'] | length == 0"
+- name: Deploy managed sources file
+  vars:
+    # https://wiki.debian.org/SourcesList#debian.sources
+    #
+    bookworm_src: '/etc/apt/sources.list.d/debian.sources'
+    trixie_src: '/etc/apt/sources.list.d/debian.sources'
+    codename: "{{ ansible_lsb['codename'] }}"
+    target_src: "{{ bookworm_src if codename == 'bookworm' else trixie_src }}"
+  ansible.builtin.template:
+    src: "templates/{{ codename }}.j2"
+    dest: "{{ target_src }}"
+    owner: "{{ su_user }}"
+    group: "{{ su_group }}"
+    mode: "0644"
 
-    - name: Remove pre-generated sources
-      ansible.builtin.file:
-        path: "{{ item['path'] }}"
-        state: absent
-      with_items: "{{ apt_deb_source['files'] }}"
-
-    - name: Deploy managed sources file
-      ansible.builtin.template:
-        src: templates/sources.j2
-        dest: "{{ apt.managed }}"
-        owner: "{{ su_user }}"
-        group: "{{ su_group }}"
-        mode: "0644"
+# TODO: add signing-keys to apt sources
+#   https://ftp-master.debian.org/keys.html
+#

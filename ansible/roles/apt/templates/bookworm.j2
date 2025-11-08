@@ -1,0 +1,28 @@
+# Deployed by Ansible
+
+Types: deb deb-src
+URIs: http://deb.debian.org/debian
+Suites: bookworm
+Enabled: yes
+Components: main non-free-firmware non-free contrib
+
+
+Types: deb deb-src
+URIs: http://security.debian.org/debian-security
+Suites: bookworm-security
+Enabled: yes
+Components: main non-free-firmware
+
+
+Types: deb deb-src
+URIs: http://deb.debian.org/debian
+Suites: bookworm-backports
+Enabled: yes
+Components: main
+
+
+Types: deb deb-src
+URIs: http://deb.debian.org/debian
+Suites: bookworm-updates
+Enabled: yes
+Components: main non-free-firmware

@@ -1,0 +1,12 @@
+---
+
+- name: Provision remote system
+  hosts: digital_ocean
+  gather_facts: true
+  become: true
+  become_user: "{{ su_user }}"
+  remote_user: "{{ su_user }}"
+  any_errors_fatal: true
+  debugger: 'on_failed'
+  roles:
+    - default_tasks

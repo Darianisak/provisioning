@@ -1,0 +1,10 @@
+Test 022 - # Check the 'default' remote provisioning order
+
+
+playbook: ansible/remote.yaml
+
+  play #1 (digital_ocean): Provision remote system	TAGS: []
+    tasks:
+      default_tasks : Ensure that system user is defined.	TAGS: [defaults]
+      Ensure managed apt sources are deployed	TAGS: [defaults]
+      Install default system packages	TAGS: [defaults]
