@@ -76,3 +76,4 @@ run_test "021" "--tags github" "# Check configuration order for packages from Gi
 DEFAULT_ARGS="ansible/remote.yaml --list-tasks --inventory ansible/inventory"
 run_test "022" " " "# Check the 'default' remote provisioning order"
 run_test "023" "--tags users" "# Check remote user provisioning order"
+run_test "024" "--tags docker" "# Check remote docker provisioning order"
