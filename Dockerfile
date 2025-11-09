@@ -12,6 +12,7 @@ FROM debian:bookworm AS test-container
 SHELL ["/bin/bash", "-exo", "pipefail", "-c"]
 USER root
 ARG INPUT_USERNAME=unset-username
+ARG UID=1000
 COPY ./bootstrap.sh /opt/bootstrap.sh
 # hadolint ignore=DL3008
 RUN \
@@ -20,10 +21,16 @@ RUN \
     && apt-get install --assume-yes --no-install-recommends \
         vim \
         # `openssl` is required for both password generation, and for the
-        # Ansible runtime to resolve URLs, etc., properly.
+        # Ansible runtime to resolve HTTPS URLs, etc., properly.
         #
         openssl \
-    && useradd -p "$(openssl passwd -6 'foo')" -ms /bin/bash "${INPUT_USERNAME}" \
+        # Required if you have an inventory with further hosts than localhost.
+        #
+        openssh-client \
+        telnet \
+    && groupadd -r -g "${UID}" "${INPUT_USERNAME}" \
+    && useradd --uid "${UID}" --gid "${UID}" \
+        -p "$(openssl passwd -6 'foo')" -ms /bin/bash "${INPUT_USERNAME}" \
     # FIXME: Should implement `bootstrap.sh` functionality here with Docker
     # directives, and/or re-implement it in Python/Ansible.
     #

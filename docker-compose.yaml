@@ -5,6 +5,7 @@ services:
       dockerfile: ./Dockerfile
       args:
         INPUT_USERNAME: ${USER}
+        UID: 1000
     volumes:
       - ./:/opt
       - "/home/${USER}/.ansible:/home/${USER}/.ansible"
