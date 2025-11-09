@@ -79,7 +79,7 @@
         database: group
         key: "{{ item }}"
       loop:
-        - "{{ docker_group }}"
+        - "docker"
         - "{{ system_user }}"
 
     - name: Get user's current groups
@@ -94,11 +94,11 @@
     - name: Add user to Docker group, if required
       become: true
       ansible.builtin.command:
-        cmd: usermod -aG {{ docker_group }} {{ system_user }}
+        cmd: usermod -aG "docker" {{ system_user }}
       register: docker_usermod
       failed_when:
         - docker_usermod.rc != 0
       changed_when:
         - docker_usermod.rc == 0
       when:
-        - 'docker_group not in docker_user_groups.stdout'
+        - '"docker" not in docker_user_groups.stdout'
