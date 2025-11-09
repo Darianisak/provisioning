@@ -20,4 +20,18 @@ apt:
 
 su_user: root
 su_group: root
-system_user: root
+system_user: darianculver
+
+users:
+  - name: darianculver
+    uid: "1000"
+    groups: sudo
+    pub: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDc7b0iifTwVGvzGoZb/niD8c+2v+aC\
+      UQYIkGp6PxnioGpEI8B/fuKtN9sfz6MmaXivz/kFTKs4Mm+oxeWVFaKrqYz+b6tVs2f/xDWr\
+      SUwi4VD/gsrI3DeBVC2T2F0WytIl1rBLJd3s9gCEBJPTvUWi/boLlLwYB+X67A+hW2qsD2GR\
+      EMxKBDrMYFPVKOKozdRCQk+JkHd9f0Y8EHX9EdkBBE5JDtrPfoJNB68XZahaF4vBd1hXRB4Y\
+      nRmUP1l6JudhglUqKIv43XIAGK1VRCnycS2m9RKXGFNSE4ljPeauRGhUJZFHwL6uZ/J+JZQ/\
+      G14E8/rTA8tRhgI5nRjmcVZORCUbOqUwqdWb/G9iNuv8XPm2iJGlvwk9vRcEkjBfNgH2mFgZ\
+      mBLizT/grWnIe2CvdS8uvtVpM69UiQHXeJQcao3OqTHet3XPFRSAoYN5NknPmT4LrESOVtsE\
+      KM/BNYlVUV7BQxjgGjf3qWc3JY+3NYGANVjzkAy90P3xk4wTbls= darianculver@darian\
+      culver"

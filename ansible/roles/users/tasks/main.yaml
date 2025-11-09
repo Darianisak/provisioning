@@ -1,0 +1,39 @@
+---
+
+- name: Set up required user accounts
+  tags:
+    - users
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    groups: "{{ item.groups }}"
+    uid: "{{ item.uid }}"
+    create_home: true
+    append: true
+    password: '!'
+    shell: /bin/bash
+  with_items: "{{ users }}"
+
+
+- name: Deploy user public keys as required
+  tags:
+    - users
+  ansible.builtin.lineinfile:
+    path: "/home/{{ item.name }}/.ssh/authorized_keys"
+    line: "{{ item.pub }}"
+    create: true
+    mode: 0400
+    owner: "{{ item.name }}"
+    group: "{{ item.name }}"
+  with_items: "{{ users }}"
+
+
+- name: Ensure 0700 of deployed ssh directory
+  tags:
+    - users
+  ansible.builtin.file:
+    path: "/home/{{ item.name }}/.ssh"
+    state: directory
+    owner: "{{ item.name }}"
+    group: "{{ item.name }}"
+    mode: 0700
+  with_items: "{{ users }}"

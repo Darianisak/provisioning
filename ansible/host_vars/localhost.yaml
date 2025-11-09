@@ -52,7 +52,6 @@ github:
 
 su_user: root
 su_group: root
-docker_group: docker
 system_user: darianculver
 
 keys:

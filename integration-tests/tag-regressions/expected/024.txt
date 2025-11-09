@@ -1,16 +1,10 @@
-Test 022 - # Check the 'default' remote provisioning order
+Test 024 - # Check remote docker provisioning order
 
 
 playbook: ansible/remote.yaml
 
   play #1 (digital_ocean): Provision remote system	TAGS: []
     tasks:
-      users : Set up required user accounts	TAGS: [users]
-      users : Deploy user public keys as required	TAGS: [users]
-      users : Ensure 0700 of deployed ssh directory	TAGS: [users]
-      default_tasks : Ensure that system user is defined.	TAGS: [defaults]
-      Ensure managed apt sources are deployed	TAGS: [defaults]
-      Install default system packages	TAGS: [defaults]
       Gather installed package lists.	TAGS: [docker]
       docker : Ensure keyring directory exists	TAGS: [docker]
       docker : Install Docker keyring	TAGS: [docker]
