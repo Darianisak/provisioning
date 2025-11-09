@@ -149,7 +149,7 @@ cd provisioning
 # `--remove-orphans` is provided to ensure we clean up old containers and don't
 # run into service name collision.
 #
-docker compose run --remove-orphans -it testing
+docker compose run --remove-orphans local_node
 
 # Navigate to the `ansible` directory. Our venv is already sourced in the shell.
 #
@@ -171,6 +171,48 @@ ansible-playbook provision.yaml --tags $YOUR_PLAY_TAG -K --ask-vault-pass
 ```
 
 Please note that this workflow relies on the use of [Ansible Tags].
+
+### Testing *remote* system provisioning with Docker
+
+This project also provides a degree of parity with a remote host, i.e., one you
+would provision over SSH in the form of two Docker containers.
+
+This workflow can be used by:
+
+``` bash
+# Starting up the 'remote' compose profile
+#
+docker compose --profile remote up --remove-orphans
+
+# Getting an interactive shell in the 'main' service container of the
+# remote profile, 'control_node'
+#
+docker compose exec -it control_node bash
+
+# Running Ansible with the `remote.yaml` playbook and feeding it an inventory.
+#
+cd ansible
+ansible-playbook -K remote.yaml --inventory /tmp/inventory
+```
+
+#### How the remote workflow works
+
+The remote workflow is intended as a parity approximation of deploying to an
+*actual* Debian 13 virtual machine.
+
+This works by:
+
+* Defining a testing SSH key pair in `docker-compose.yaml`.
+  * This key pair *is not* sensitive and was created for this purpose alone.
+* Mounting the respective key pair portions into `control_node`
+  and `follower_node`.
+* Ensuring the `follower_node` is running `sshd` as part of it's entrypoint,
+  and is listening/exposing port 22.
+* Overriding the default SSH config for `control_node` to
+  disable `StrictHostKeyChecking`.
+
+This workflow *isn't* without it's faults, but it does give us some degree of
+confidence that our playbooks won't seriously damage a *real* remote machine.
 
 ### Using the Ansible debugger
 
@@ -252,7 +294,8 @@ entire play (based on tags) and tracks it in git for easy regression analysis.
 These checks can be run like so:
 
 ``` bash
-docker compose run --remove-orphans -it testing
+docker compose run --remove-orphans local_node
+
 
 # Run `TestTags` to get the apply manifest.
 #

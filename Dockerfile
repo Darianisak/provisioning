@@ -1,14 +1,15 @@
-# test-container:
+# controller:
 #   Intended to provide a 'isolated' and interactive environment for testing
 #   Ansible playbooks and associated system configuration.
 #
 # To build:
-#   docker build --file Dockerfile --build-arg INPUT_USERNAME=$USER .
+#   docker build --file Dockerfile --target controller \
+#       --tag controller --build-arg INPUT_USERNAME=$USER .
 #
 # It's recommended to run this image via `docker compose`:
-#   docker compose run --remove-orphans --force-recreate -it testing
+#   docker compose --profile local run --remove-orphans --build local_node
 #
-FROM debian:bookworm AS test-container
+FROM debian:bookworm AS controller
 SHELL ["/bin/bash", "-exo", "pipefail", "-c"]
 USER root
 ARG INPUT_USERNAME=unset-username
@@ -35,6 +36,9 @@ RUN \
     # directives, and/or re-implement it in Python/Ansible.
     #
     && /opt/bootstrap.sh \
+    && mkdir "/home/${INPUT_USERNAME}/.ssh" \
+    && chown "${INPUT_USERNAME}:${INPUT_USERNAME}" \
+        "/home/${INPUT_USERNAME}/.ssh" \
     && rm --force --recursive /root/.cache \
     && rm --force /opt/bootstrap.sh \
     && apt-get clean --assume-yes \
@@ -45,3 +49,28 @@ USER ${INPUT_USERNAME}
 # sourced as part of loading into our environment.
 #
 ENV PATH="/home/${INPUT_USERNAME}/venvs/ansible/bin:${PATH}"
+
+
+# follower:
+#   Intended as a remote 'server' for testing multi node Ansible playbooks.
+#
+# To build:
+#   docker build --file Dockerfile --target follower --tag follower .
+#
+FROM debian:trixie AS follower
+SHELL ["/bin/bash", "-exo", "pipefail", "-c"]
+USER root
+EXPOSE 22
+RUN \
+    apt-get update \
+    && apt-get dist-upgrade --assume-yes \
+    && apt-get install --assume-yes --no-install-recommends \
+        openssh-server \
+        lsb-release \
+        sudo \
+        git \
+        curl \
+        python3-venv \
+        python3-apt \
+    && apt-get clean --assume-yes \
+    && rm -rf /var/lib/apt/lists/*
