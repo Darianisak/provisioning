@@ -1,10 +1,183 @@
 ---
 services:
-  testing:
+  # `local_node` is intended as a testing environment for self applied Ansible
+  # runs, i.e., setting up localhost and not worrying about a remote system.
+  #
+  local_node:
     build:
       dockerfile: ./Dockerfile
+      target: controller
       args:
         INPUT_USERNAME: ${USER}
+        UID: 1000
+    profiles:
+      - local
+    container_name: ansible_local
+    hostname: ansible.local
     volumes:
       - ./:/opt
       - "/home/${USER}/.ansible:/home/${USER}/.ansible"
+
+
+  # `control_node` is intended to be used as the primary service container
+  # for testing playbooks against remote hosts, such as `follower_node`.
+  #
+  control_node:
+    build:
+      dockerfile: ./Dockerfile
+      target: controller
+      args:
+        INPUT_USERNAME: ${USER}
+        UID: 1000
+    profiles:
+      - remote
+    container_name: ansible_controller
+    hostname: ansible.controller
+    configs:
+      # Don't mount this overtop the 'real' inventory, or it'll rewrite the
+      # file and mess with the permission bits.
+      #
+      - mode: 0644
+        source: host.inventory
+        target: /tmp/inventory
+      # We mount some 'real' ssh keys into the container to facilitate 'remote'
+      # testing. These keys were created explicitly for this purpose - I don't
+      # care about them being in .git
+      #
+      - mode: 0600
+        gid: "1000"
+        uid: "1000"
+        source: ssh.private
+        target: /home/${USER}/.ssh/id_rsa
+      - mode: 0644
+        gid: "1000"
+        uid: "1000"
+        source: ssh.public
+        target: /home/${USER}/.ssh/id_rsa.pub
+      - mode: 0400
+        gid: "1000"
+        uid: "1000"
+        source: ssh.config
+        target: /home/${USER}/.ssh/config
+    command:
+      - sleep
+      - "3600"
+    volumes:
+      - ./:/opt
+      - "/home/${USER}/.ansible:/home/${USER}/.ansible"
+
+
+  # `follower_node` is intended to provide a testing environment for
+  # provisioning remote systems, e.g., Digital Ocean VMs.
+  #
+  follower_node:
+    build:
+      dockerfile: ./Dockerfile
+      target: follower
+    profiles:
+      - remote
+    # We'll detach this by default so it doesn't fight with `control_node`.
+    #
+    # attach: false
+    container_name: ansible_follower
+    hostname: ansible.follower
+    configs:
+      - mode: 0644
+        gid: "0"
+        uid: "0"
+        source: ssh.public
+        target: /root/.ssh/authorized_keys
+      - mode: 0755
+        source: follower.entry
+        target: /entrypoint.sh
+    command:
+      # Start the follower service listening for ssh.
+      #
+      - /entrypoint.sh
+
+
+configs:
+  # The `host.inventory` config block is used to override our real inventory
+  # spec in the `control_node` service to replace the 'real' Digital Ocean
+  # remote with our `follower_node` service container.
+  #
+  host.inventory:
+    content: |
+      [default]
+      localhost
+
+      [digital_ocean]
+      ansible.follower
+
+  follower.entry:
+    # This is hacky, but I can't be bothered getting the container working
+    # properly right now.
+    #
+    content: |
+      #! /bin/bash
+      /usr/sbin/sshd &
+      sleep 3600
+
+  ssh.config:
+    content: |
+      Host ansible.*
+        StrictHostKeyChecking no
+
+  # This looks dodgy as hell, but it isn't (really).
+  #
+  # This SSH keypair was generated within a short lived docker container and
+  # is ONLY intended to be used within the context of this compose config to
+  # enable inter-container communications via SSH, e.g., to provide parity for
+  # remote Ansible playbooks.
+  #
+  ssh.private:
+    content: |
+      -----BEGIN OPENSSH PRIVATE KEY-----
+      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
+      -----END OPENSSH PRIVATE KEY-----
+
+  ssh.public:
+    content: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCghshzCnYHO5pui1sP957Xvogz\
+      HnK09pm+Fz49B2JjGRwIpj4pSQ9wTu4P1Pw/XefEJRQwaqgqtdetNsyWzpVC4gLR/0wdR+ir\
+      6ozfIG/EBP835UhVYRalRjGHY+OfFrFq7pDY9qc/gG0YN/4duiGbwMrcFCQD3hurP8W99STv\
+      KtmUB7feIsxKE/8QYpzTMe2ZoUdaTgDZb7u6DnUc1vXIAwDwJwbZ/KZsKsnj8JLnGvophGVt\
+      tkR1r9XfZtsmcSq759qgAe94CVua5SCa3ErmsPCx+EtH9TxwrNkb/+7sRlXHgGud3+fjFcgo\
+      rqnIfupsaQ+VKUdzQRPLuqkxPcH7dC0gEgpO2/f7XvSbjFsomOsCvrMWJNkW57odaFr506l9\
+      w+jXtcbk/lXXTmVrE0jl5e8V4Pg+AVio1qrkWE5sCwsRqeSl8Z9AewO3gDyfd1yU/LhUoj3C\
+      BcMprthRjysFfbiJpEvyqPAzRysgivDnU41OgjeDIvlO3v9zli06EGU= darianculver@an\
+      sible.local"
