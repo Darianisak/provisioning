@@ -9,4 +9,5 @@
   any_errors_fatal: true
   debugger: 'on_failed'
   roles:
+    - users
     - default_tasks
