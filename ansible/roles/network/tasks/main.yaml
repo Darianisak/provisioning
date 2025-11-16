@@ -1,0 +1,33 @@
+---
+
+# yamllint disable-line rule:line-length
+# https://docs.ansible.com/projects/ansible/latest/collections/community/general/listen_ports_facts_module.html
+#
+
+- name: Gather facts on listening ports
+  tags:
+    - network
+  community.general.listen_ports_facts:
+
+
+- name: Check for TCP allowlist violations
+  tags:
+    - network
+  ansible.builtin.fail:
+    msg: Non-allowed TCP port, {{ item.port }}, found.
+  when:
+    - item.port not in network.tcp_allow
+    - not network.container  # FIXME
+  loop: "{{ tcp_listen }}"
+
+
+- name: Check for UDP allowlist violations
+  tags:
+    - network
+  ansible.builtin.fail:
+    msg: Non-allowed UDP port, {{ item.port }}, found.
+  any_errors_fatal: false
+  when:
+    - item.port not in network.udp_allow
+    - not network.container  # FIXME
+  loop: "{{ udp_listen }}"

@@ -11,6 +11,7 @@
   any_errors_fatal: true
   debugger: 'on_failed'
   roles:
+    - network
     - users
     - default_tasks
     - docker

@@ -35,3 +35,17 @@ users:
       mBLizT/grWnIe2CvdS8uvtVpM69UiQHXeJQcao3OqTHet3XPFRSAoYN5NknPmT4LrESOVtsE\
       KM/BNYlVUV7BQxjgGjf3qWc3JY+3NYGANVjzkAy90P3xk4wTbls= darianculver@darian\
       culver"
+
+network:
+  tcp_allow:
+    - 42783  # FIXME - Unknown
+    - 22     # SSH
+
+  udp_allow:
+    - 33805  # FIXME - Unknown
+
+  # FIXME - do this to skip the port allowlist validation for Dockerized hosts.
+  # This is because theres a dynamic alloc of ports for runtimes, and I'm not
+  # sure *how* this is informed.
+  #
+  container: true

@@ -35,3 +35,16 @@ users:
       mBLizT/grWnIe2CvdS8uvtVpM69UiQHXeJQcao3OqTHet3XPFRSAoYN5NknPmT4LrESOVtsE\
       KM/BNYlVUV7BQxjgGjf3qWc3JY+3NYGANVjzkAy90P3xk4wTbls= darianculver@darian\
       culver"
+
+network:
+  tcp_allow:
+    - 22    # SSH
+    - 25    # MTA
+    - 53    # Systemd-resolve (DNS)
+    - 5355  # Systemd-resolve (DNS)
+
+  udp_allow:
+    - 53    # Systemd-resolve (DNS)
+    - 5355  # Systemd-resolve (DNS)
+
+  container: false
