@@ -1,7 +1,9 @@
 ---
 
 - name: Provision remote system
-  hosts: digital_ocean
+  hosts:
+    - digital_ocean
+    - docker
   gather_facts: true
   become: true
   become_user: "{{ su_user }}"

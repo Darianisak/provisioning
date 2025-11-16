@@ -3,7 +3,7 @@ Test 023 - # Check remote user provisioning order
 
 playbook: ansible/remote.yaml
 
-  play #1 (digital_ocean): Provision remote system	TAGS: []
+  play #1 (digital_ocean,docker): Provision remote system	TAGS: []
     tasks:
       users : Set up required user accounts	TAGS: [users]
       users : Deploy user public keys as required	TAGS: [users]
