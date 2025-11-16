@@ -1,7 +1,9 @@
 ---
 
 - name: Provision remote system
-  hosts: digital_ocean
+  hosts:
+    - digital_ocean
+    - docker
   gather_facts: true
   become: true
   become_user: "{{ su_user }}"
@@ -9,6 +11,7 @@
   any_errors_fatal: true
   debugger: 'on_failed'
   roles:
+    - network
     - users
     - default_tasks
     - docker

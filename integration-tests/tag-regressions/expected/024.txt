@@ -3,7 +3,7 @@ Test 024 - # Check remote docker provisioning order
 
 playbook: ansible/remote.yaml
 
-  play #1 (digital_ocean): Provision remote system	TAGS: []
+  play #1 (digital_ocean,docker): Provision remote system	TAGS: []
     tasks:
       Gather installed package lists.	TAGS: [docker]
       docker : Ensure keyring directory exists	TAGS: [docker]

@@ -106,8 +106,10 @@ configs:
       [default]
       localhost
 
-      [digital_ocean]
+      [docker]
       ansible.follower
+
+      [digital_ocean]
 
   follower.entry:
     # This is hacky, but I can't be bothered getting the container working

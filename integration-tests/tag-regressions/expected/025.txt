@@ -1,0 +1,10 @@
+Test 025 - # Check remote hosts ports and network conf
+
+
+playbook: ansible/remote.yaml
+
+  play #1 (digital_ocean,docker): Provision remote system	TAGS: []
+    tasks:
+      network : Gather facts on listening ports	TAGS: [network]
+      network : Check for TCP allowlist violations	TAGS: [network]
+      network : Check for UDP allowlist violations	TAGS: [network]

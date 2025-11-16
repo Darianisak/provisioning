@@ -38,13 +38,14 @@ users:
 
 network:
   tcp_allow:
-    - 22    # SSH
-    - 25    # MTA
-    - 53    # Systemd-resolve (DNS)
-    - 5355  # Systemd-resolve (DNS)
+    - 42783  # FIXME - Unknown
+    - 22     # SSH
 
   udp_allow:
-    - 53    # Systemd-resolve (DNS)
-    - 5355  # Systemd-resolve (DNS)
+    - 33805  # FIXME - Unknown
 
-  container: false
+  # FIXME - do this to skip the port allowlist validation for Dockerized hosts.
+  # This is because theres a dynamic alloc of ports for runtimes, and I'm not
+  # sure *how* this is informed.
+  #
+  container: true
