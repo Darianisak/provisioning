@@ -16,6 +16,7 @@ apt:
     - sudo  # Required for 'become' to work.
     - jq
     - yq
+    - locales
     - python3-pip
     - keepassxc  # TODO - Need a solution for pull key dbs.
     - gpg
